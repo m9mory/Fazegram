@@ -78,11 +78,11 @@ plist_fragment(
     <key>CFBundleDevelopmentRegion</key>
     <string>en</string>
     <key>CFBundleDisplayName</key>
-    <string>Test</string>
+    <string>Fazegram</string>
     <key>CFBundleIdentifier</key>
     <string>org.telegram.{module_name}</string>
     <key>CFBundleName</key>
-    <string>Telegram</string>
+    <string>Fazegram</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleSignature</key>
