@@ -70,21 +70,25 @@ jobs:
           rm -rf "$OUTPUT_PATH"
           mkdir -p "$OUTPUT_PATH"
           
-          # УЛУЧШЕННЫЙ ПОИСК: Ищем вообще любой .ipa, который родил Базель
-          echo "=== Начинаем поиск собранного IPA ==="
-          FOUND_IPA=$(find "$SOURCE_DIR" \( -name "bazel-out" -o -name "bazel-bin" \) -prune -o -name "*.ipa" -print -quit)
-          
-          if [ -n "$FOUND_IPA" ]; then
-            echo "Ура, нашли IPA тут: $FOUND_IPA"
-            cp "$FOUND_IPA" "$OUTPUT_PATH/Fazegram.ipa"
+          # Забираем IPA по точному пути, который выплюнул Базель
+          echo "=== Копируем готовый IPA ==="
+          if [ -f "$SOURCE_DIR/bazel-bin/Telegram/Telegram.ipa" ]; then
+            echo "Нашли файл!"
+            cp "$SOURCE_DIR/bazel-bin/Telegram/Telegram.ipa" "$OUTPUT_PATH/Fazegram.ipa"
           else
-            echo "БЛИН! Базель не собрал IPA или спрятал его. Выводим список файлов для отладки:"
-            find "$SOURCE_DIR" -name "*.ipa" || true
+            echo "Пробуем скопировать по ссылке (симлинку)..."
+            cp -L "$SOURCE_DIR/bazel-bin/Telegram/Telegram.ipa" "$OUTPUT_PATH/Fazegram.ipa" || true
+          fi
+          
+          # Проверка на случай непредвиденной магии
+          if [ ! -f "$OUTPUT_PATH/Fazegram.ipa" ]; then
+            echo "Ошибка: файл Fazegram.ipa не скопировался!"
             exit 1
           fi
           
           mkdir -p "$SOURCE_DIR/build/DSYMs"
-          find "$SOURCE_DIR/bazel-out" -name "*.dSYM" -exec cp -R {} "$SOURCE_DIR/build/DSYMs/" \;
+          # Ищем dSYM, разрешая find ходить по симлинкам Базеля (флаг -H)
+          find -H "$SOURCE_DIR/bazel-bin" -name "*.dSYM" -exec cp -R {} "$SOURCE_DIR/build/DSYMs/" \;
           
           zip -r "$OUTPUT_PATH/Fazegram.DSYMs.zip" "$SOURCE_DIR/build/DSYMs" 1>/dev/null
 
