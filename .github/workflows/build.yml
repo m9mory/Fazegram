@@ -70,8 +70,18 @@ jobs:
           rm -rf "$OUTPUT_PATH"
           mkdir -p "$OUTPUT_PATH"
           
-          # ИСПРАВЛЕНО: Ищем файлы там, где реально работал Базель — в $SOURCE_DIR/bazel-out
-          find "$SOURCE_DIR/bazel-out" -name "Telegram.ipa" -exec cp {} "$OUTPUT_PATH/Fazegram.ipa" \;
+          # УЛУЧШЕННЫЙ ПОИСК: Ищем вообще любой .ipa, который родил Базель
+          echo "=== Начинаем поиск собранного IPA ==="
+          FOUND_IPA=$(find "$SOURCE_DIR" \( -name "bazel-out" -o -name "bazel-bin" \) -prune -o -name "*.ipa" -print -quit)
+          
+          if [ -n "$FOUND_IPA" ]; then
+            echo "Ура, нашли IPA тут: $FOUND_IPA"
+            cp "$FOUND_IPA" "$OUTPUT_PATH/Fazegram.ipa"
+          else
+            echo "БЛИН! Базель не собрал IPA или спрятал его. Выводим список файлов для отладки:"
+            find "$SOURCE_DIR" -name "*.ipa" || true
+            exit 1
+          fi
           
           mkdir -p "$SOURCE_DIR/build/DSYMs"
           find "$SOURCE_DIR/bazel-out" -name "*.dSYM" -exec cp -R {} "$SOURCE_DIR/build/DSYMs/" \;
