@@ -56,7 +56,6 @@ jobs:
 
           python3 build-system/Make/ImportCertificates.py --path build-system/fake-codesigning/certs
           
-          # Ограничиваем ОЗУ для Bazel без ломания скрипта Make.py
           export BAZEL_FLAGS="--local_ram_resources=6144"
 
           python3 -u build-system/Make/Make.py \
@@ -67,20 +66,17 @@ jobs:
             --configuration=release_arm64 \
             --buildNumber="$BUILD_NUMBER"
 
-          OUTPUT_PATH="build/artifacts"
+          OUTPUT_PATH="$SOURCE_DIR/build/artifacts"
           rm -rf "$OUTPUT_PATH"
           mkdir -p "$OUTPUT_PATH"
           
-          for f in bazel-out/applebin_ios-ios_arm*-opt-ST-*/bin/Telegram/Telegram.ipa; do
-            cp "$f" "$OUTPUT_PATH/Fazegram.ipa"
-          done
-
-          mkdir -p build/DSYMs
-          for f in bazel-out/applebin_ios-ios_arm*-opt-ST-*/bin/Telegram/*.dSYM; do
-            cp -R "$f" build/DSYMs/
-          done
+          # ИСПРАВЛЕНО: Ищем файлы там, где реально работал Базель — в $SOURCE_DIR/bazel-out
+          find "$SOURCE_DIR/bazel-out" -name "Telegram.ipa" -exec cp {} "$OUTPUT_PATH/Fazegram.ipa" \;
           
-          zip -r "./$OUTPUT_PATH/Fazegram.DSYMs.zip" build/DSYMs 1>/dev/null
+          mkdir -p "$SOURCE_DIR/build/DSYMs"
+          find "$SOURCE_DIR/bazel-out" -name "*.dSYM" -exec cp -R {} "$SOURCE_DIR/build/DSYMs/" \;
+          
+          zip -r "$OUTPUT_PATH/Fazegram.DSYMs.zip" "$SOURCE_DIR/build/DSYMs" 1>/dev/null
 
       - name: Save Bazel Cache
         uses: actions/cache/save@v3
