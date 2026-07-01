@@ -255,6 +255,22 @@ public func rootPathForBasePath(_ appGroupPath: String) -> String {
     return appGroupPath + "/telegram-data"
 }
 
+public func sharedContainerBasePath(_ baseAppBundleId: String) -> String {
+    let appGroupName = "group.\(baseAppBundleId)"
+    if let appGroupUrl = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupName) {
+        return appGroupUrl.path
+    }
+    if let documentsUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
+        return documentsUrl.path
+    }
+    return NSTemporaryDirectory()
+}
+
+public func appGroupContainerBasePath(_ baseAppBundleId: String) -> String? {
+    let appGroupName = "group.\(baseAppBundleId)"
+    return FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupName)?.path
+}
+
 public func performAppGroupUpgrades(appGroupPath: String, rootPath: String) {
     DispatchQueue.global(qos: .default).async {
         let _ = try? FileManager.default.createDirectory(at: URL(fileURLWithPath: rootPath), withIntermediateDirectories: true, attributes: nil)

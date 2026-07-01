@@ -401,25 +401,31 @@
 "Date.ChatDateHeaderYear" = "%1$@ %2$@, %3$@";
 
 // Tour
-"Tour.Title1" = "Telegram";
-"Tour.Text1" = "The world's **fastest** messaging app.\nIt is **free** and **secure**.";
+"Tour.Title1" = "Fazegram";
+"Tour.Text1" = "The world's **fastest** messaging app.
+It is **free** and **secure**.";
 
 "Tour.Title2" = "Fast";
-"Tour.Text2" = "**Telegram** delivers messages\nfaster than any other application.";
+"Tour.Text2" = "**Fazegram** delivers messages
+faster than any other application.";
 
 "Tour.Title3" = "Powerful";
-"Tour.Text3" = "**Telegram** has no limits on\nthe size of your media and chats.";
+"Tour.Text3" = "**Fazegram** has no limits on
+the size of your media and chats.";
 
 "Tour.Title4" = "Secure";
-"Tour.Text4" = "**Telegram** keeps your messages\nsafe from hacker attacks.";
+"Tour.Text4" = "**Fazegram** keeps your messages
+safe from hacker attacks.";
 
 "Tour.Title5" = "Cloud-Based";
-"Tour.Text5" = "**Telegram** lets you access your\nmessages from multiple devices.";
+"Tour.Text5" = "**Fazegram** lets you access your
+messages from multiple devices.";
 
 "Tour.Title6" = "Free";
-"Tour.Text6" = "**Telegram** provides free unlimited\ncloud storage for chats and media.";
+"Tour.Text6" = "**Fazegram** provides free unlimited
+cloud storage for chats and media.";
 
-"Tour.StartButton" = "Start Messaging";
+"Tour.StartButton" = "Start using Fazegram";
 
 // Login
 "Login.PhoneAndCountryHelp" = "Please confirm your country code\nand enter your phone number.";

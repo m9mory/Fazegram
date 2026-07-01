@@ -754,14 +754,14 @@ private final class NotificationServiceHandler {
         let apiHash: String = buildConfig.apiHash
         let languagesCategory = "ios"
 
-        let appGroupName = "group.\(baseAppBundleId)"
-        let maybeAppGroupUrl = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupName)
-
-        guard let appGroupUrl = maybeAppGroupUrl else {
-            return nil
-        }
+        let appGroupPath = sharedContainerBasePath(baseAppBundleId)
+        let appGroupUrl = URL(fileURLWithPath: appGroupPath)
+        let appGroupContainerPath = appGroupContainerBasePath(baseAppBundleId)
 
         let rootPath = rootPathForBasePath(appGroupUrl.path)
+        if let appGroupContainerPath = appGroupContainerPath {
+            performAppGroupUpgrades(appGroupPath: appGroupContainerPath, rootPath: rootPath)
+        }
 
         TempBox.initializeShared(basePath: rootPath, processType: "notification", launchSpecificId: Int64.random(in: Int64.min ... Int64.max))
 

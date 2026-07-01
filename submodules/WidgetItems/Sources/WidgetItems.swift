@@ -359,12 +359,8 @@ public struct WidgetPresentationData: Codable, Equatable {
         }
         let baseAppBundleId = String(appBundleIdentifier[..<lastDotRange.lowerBound])
         
-        let appGroupName = "group.\(baseAppBundleId)"
-        let maybeAppGroupUrl = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupName)
-        
-        guard let appGroupUrl = maybeAppGroupUrl else {
-            return WidgetPresentationData.default
-        }
+        let appGroupPath = sharedContainerBasePath(baseAppBundleId)
+        let appGroupUrl = URL(fileURLWithPath: appGroupPath)
         
         let rootPath = rootPathForBasePath(appGroupUrl.path)
         

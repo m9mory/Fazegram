@@ -322,15 +322,14 @@ private final class EmbeddedBroadcastUploadImpl: BroadcastUploadImpl {
 
         let baseAppBundleId = String(appBundleIdentifier[..<lastDotRange.lowerBound])
 
-        let appGroupName = "group.\(baseAppBundleId)"
-        let maybeAppGroupUrl = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupName)
-
-        guard let appGroupUrl = maybeAppGroupUrl else {
-            self.finishWithError()
-            return
-        }
+        let appGroupPath = sharedContainerBasePath(baseAppBundleId)
+        let appGroupUrl = URL(fileURLWithPath: appGroupPath)
+        let appGroupContainerPath = appGroupContainerBasePath(baseAppBundleId)
 
         let rootPath = rootPathForBasePath(appGroupUrl.path)
+        if let appGroupContainerPath = appGroupContainerPath {
+            performAppGroupUpgrades(appGroupPath: appGroupContainerPath, rootPath: rootPath)
+        }
         
         EngineTempBox.initializeShared(basePath: rootPath, processType: "share", launchSpecificId: Int64.random(in: Int64.min ... Int64.max))
 

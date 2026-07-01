@@ -98,17 +98,16 @@ class DefaultIntentHandler: INExtension, INSendMessageIntentHandling, INSearchFo
         let apiHash: String = buildConfig.apiHash
         let languagesCategory = "ios"
         
-        let appGroupName = "group.\(baseAppBundleId)"
-        let maybeAppGroupUrl = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupName)
-        
-        guard let appGroupUrl = maybeAppGroupUrl else {
-            return
-        }
+        let appGroupPath = sharedContainerBasePath(baseAppBundleId)
+        let appGroupUrl = URL(fileURLWithPath: appGroupPath)
+        let appGroupContainerPath = appGroupContainerBasePath(baseAppBundleId)
         
         self.appGroupUrl = appGroupUrl
         
         let rootPath = rootPathForBasePath(appGroupUrl.path)
-        performAppGroupUpgrades(appGroupPath: appGroupUrl.path, rootPath: rootPath)
+        if let appGroupContainerPath = appGroupContainerPath {
+            performAppGroupUpgrades(appGroupPath: appGroupContainerPath, rootPath: rootPath)
+        }
         
         self.rootPath = rootPath
         
@@ -878,19 +877,16 @@ private final class WidgetIntentHandler {
         
         let baseAppBundleId = String(appBundleIdentifier[..<lastDotRange.lowerBound])
         
-        let appGroupName = "group.\(baseAppBundleId)"
-        let maybeAppGroupUrl = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupName)
-        
-        guard let appGroupUrl = maybeAppGroupUrl else {
-            return
-        }
+        let appGroupPath = sharedContainerBasePath(baseAppBundleId)
+        let appGroupUrl = URL(fileURLWithPath: appGroupPath)
+        let appGroupContainerPath = appGroupContainerBasePath(baseAppBundleId)
         
         self.appGroupUrl = appGroupUrl
         
         let rootPath = rootPathForBasePath(appGroupUrl.path)
-        performAppGroupUpgrades(appGroupPath: appGroupUrl.path, rootPath: rootPath)
-        
-        self.rootPath = rootPath
+        if let appGroupContainerPath = appGroupContainerPath {
+            performAppGroupUpgrades(appGroupPath: appGroupContainerPath, rootPath: rootPath)
+        }
         
         TempBox.initializeShared(basePath: rootPath, processType: "siri", launchSpecificId: Int64.random(in: Int64.min ... Int64.max))
         

@@ -528,8 +528,9 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
         let appVersion = (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String) ?? "unknown"
         
         let baseAppBundleId = Bundle.main.bundleIdentifier!
-        let appGroupName = "group.\(baseAppBundleId)"
-        let maybeAppGroupUrl = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupName)
+        let appGroupPath = sharedContainerBasePath(baseAppBundleId)
+        let appGroupUrl = URL(fileURLWithPath: appGroupPath)
+        let appGroupContainerPath = appGroupContainerBasePath(baseAppBundleId)
         
         let buildConfig = BuildConfig(baseAppBundleId: baseAppBundleId)
         self.buildConfig = buildConfig
@@ -641,11 +642,6 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
             isICloudEnabled: buildConfig.isICloudEnabled
         )
         
-        guard let appGroupUrl = maybeAppGroupUrl else {
-            self.mainWindow?.presentNative(UIAlertController(title: nil, message: "Error 2", preferredStyle: .alert))
-            return true
-        }
-        
         var isDebugConfiguration = false
         #if DEBUG
         isDebugConfiguration = true
@@ -665,14 +661,14 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
 
         let rootPath: String
         if isUITest {
-            let testDataPath = appGroupUrl.path + "/telegram-ui-tests-data"
+            let testDataPath = appGroupPath + "/telegram-ui-tests-data"
             let _ = try? FileManager.default.removeItem(atPath: testDataPath)
             rootPath = rootPathForBasePath(testDataPath)
         } else {
-            rootPath = rootPathForBasePath(appGroupUrl.path)
+            rootPath = rootPathForBasePath(appGroupPath)
         }
-        if !isUITest {
-            performAppGroupUpgrades(appGroupPath: appGroupUrl.path, rootPath: rootPath)
+        if !isUITest, let appGroupContainerPath = appGroupContainerPath {
+            performAppGroupUpgrades(appGroupPath: appGroupContainerPath, rootPath: rootPath)
         }
         
         let deviceSpecificEncryptionParameters = BuildConfig.deviceSpecificEncryptionParameters(rootPath, baseAppBundleId: baseAppBundleId)
