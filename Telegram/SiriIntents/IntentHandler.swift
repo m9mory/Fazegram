@@ -887,20 +887,22 @@ private final class WidgetIntentHandler {
         if let appGroupContainerPath = appGroupContainerPath {
             performAppGroupUpgrades(appGroupPath: appGroupContainerPath, rootPath: rootPath)
         }
-        
+
+        self.rootPath = rootPath
+
         TempBox.initializeShared(basePath: rootPath, processType: "siri", launchSpecificId: Int64.random(in: Int64.min ... Int64.max))
-        
+
         let logsPath = rootPath + "/logs/siri-logs"
         let _ = try? FileManager.default.createDirectory(atPath: logsPath, withIntermediateDirectories: true, attributes: nil)
-        
+
         setupSharedLogger(rootPath: rootPath, path: logsPath)
-        
+
         initializeAccountManagement()
-        
+
         let deviceSpecificEncryptionParameters = BuildConfig.deviceSpecificEncryptionParameters(rootPath, baseAppBundleId: baseAppBundleId)
         let encryptionParameters = ValueBoxEncryptionParameters(forceEncryptionIfNoSet: false, key: ValueBoxEncryptionParameters.Key(data: deviceSpecificEncryptionParameters.key)!, salt: ValueBoxEncryptionParameters.Salt(data: deviceSpecificEncryptionParameters.salt)!)
         self.encryptionParameters = encryptionParameters
-        
+
         let view = AccountManager<TelegramAccountManagerTypes>.getCurrentRecords(basePath: rootPath + "/accounts-metadata")
         
         var result: [(AccountRecordId, Int, PeerId, Bool)] = []

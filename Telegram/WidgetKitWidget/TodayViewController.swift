@@ -80,9 +80,9 @@ private func getCommonTimeline(friends: [Friend]?, in context: TimelineProviderC
     }
     
     let baseAppBundleId = String(appBundleIdentifier[..<lastDotRange.lowerBound])
-    
-let appGroupPath = sharedContainerBasePath(baseAppBundleId)
-        let appGroupUrl = URL(fileURLWithPath: appGroupPath)
+
+    let appGroupPath = sharedContainerBasePath(baseAppBundleId)
+    let appGroupUrl = URL(fileURLWithPath: appGroupPath)
     
     let rootPath = rootPathForBasePath(appGroupUrl.path)
     
