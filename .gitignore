@@ -79,6 +79,7 @@ xcode-files
 .sourcekit-lsp/**
 /.claude/
 **/.claude/settings.local.json
+tgapi.txt
 **/.vscode/launch.json
 /buildbox/*
 **/node_modules/
