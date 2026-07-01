@@ -359,10 +359,19 @@ public struct WidgetPresentationData: Codable, Equatable {
         }
         let baseAppBundleId = String(appBundleIdentifier[..<lastDotRange.lowerBound])
         
-        let appGroupPath = sharedContainerBasePath(baseAppBundleId)
-        let appGroupUrl = URL(fileURLWithPath: appGroupPath)
-        
-        let rootPath = rootPathForBasePath(appGroupUrl.path)
+        let appGroupName = "group.\(baseAppBundleId)"
+        let maybeAppGroupUrl = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupName)
+
+        let appGroupUrl: URL
+        if let url = maybeAppGroupUrl {
+            appGroupUrl = url
+        } else if let documentsUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
+            appGroupUrl = documentsUrl
+        } else {
+            appGroupUrl = FileManager.default.temporaryDirectory
+        }
+
+        let rootPath = appGroupUrl.path + "/telegram-data"
         
         if let data = try? Data(contentsOf: URL(fileURLWithPath: widgetPresentationDataPath(rootPath: rootPath))), let value = try? JSONDecoder().decode(WidgetPresentationData.self, from: data) {
             return value
