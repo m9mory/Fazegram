@@ -34,13 +34,21 @@ class ShareRootController: UIViewController {
             
             let languagesCategory = "ios"
             
-            let appGroupPath = sharedContainerBasePath(baseAppBundleId)
-            let appGroupUrl = URL(fileURLWithPath: appGroupPath)
-            let appGroupContainerPath = appGroupContainerBasePath(baseAppBundleId)
+            let appGroupName = "group.\(baseAppBundleId)"
+            let maybeAppGroupUrl = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupName)
+
+            let appGroupUrl: URL
+            if let url = maybeAppGroupUrl {
+                appGroupUrl = url
+            } else if let documentsUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
+                appGroupUrl = documentsUrl
+            } else {
+                appGroupUrl = FileManager.default.temporaryDirectory
+            }
             
             let rootPath = appGroupUrl.path + "/telegram-data"
-            if let appGroupContainerPath = appGroupContainerPath {
-                performAppGroupUpgrades(appGroupPath: appGroupContainerPath, rootPath: rootPath)
+            if maybeAppGroupUrl == nil {
+                let _ = try? FileManager.default.createDirectory(at: URL(fileURLWithPath: rootPath), withIntermediateDirectories: true, attributes: nil)
             }
             
             let deviceSpecificEncryptionParameters = BuildConfig.deviceSpecificEncryptionParameters(rootPath, baseAppBundleId: baseAppBundleId)

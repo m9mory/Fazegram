@@ -5,6 +5,7 @@ import NotificationCenter
 import BuildConfig
 import WidgetItems
 import AppLockState
+import TelegramCore
 import SwiftUI
 import WidgetKit
 import Intents
