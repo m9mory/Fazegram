@@ -1107,8 +1107,8 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
         }
         bootLog("STEP19: systemUserInterfaceStyle=\(systemUserInterfaceStyle)")
 
+        bootLog("STEP20: before sharedContextSignal")
         let sharedContextSignal = currentPresentationDataAndSettings(accountManager: accountManager, systemUserInterfaceStyle: systemUserInterfaceStyle)
-        bootLog("STEP20: sharedContextSignal created")
         |> map { initialPresentationDataAndSettings -> (AccountManager, InitialPresentationDataAndSettings) in
             return (accountManager, initialPresentationDataAndSettings)
         }
