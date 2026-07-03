@@ -9,6 +9,8 @@ on:
 jobs:
   build:
     runs-on: macos-15
+    permissions:
+      contents: write
 
     steps:
       - uses: actions/checkout@v2
@@ -93,39 +95,26 @@ jobs:
           zip -r "$OUTPUT_PATH/Fazegram.DSYMs.zip" "$SOURCE_DIR/build/DSYMs" 1>/dev/null
 
       - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: build-${{ env.BUILD_NUMBER }}
-          release_name: Fazegram ${{ env.APP_VERSION }} (${{ env.BUILD_NUMBER }})
-          body: |
-            An unsigned build of Fazegram for iOS ${{ env.APP_VERSION }} (${{ env.BUILD_NUMBER }})
-          draft: false
-          prerelease: false
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "build-$BUILD_NUMBER" \
+            --title "Fazegram $APP_VERSION ($BUILD_NUMBER)" \
+            --notes "An unsigned build of Fazegram for iOS $APP_VERSION ($BUILD_NUMBER)"
 
       - name: Upload Release IPA
-        id: upload-release-ipa
-        uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: /Users/Shared/telegram-ios/build/artifacts/Fazegram.ipa
-          asset_name: Fazegram.ipa
-          asset_content_type: application/octet-stream
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload "build-$BUILD_NUMBER" \
+            /Users/Shared/telegram-ios/build/artifacts/Fazegram.ipa
 
       - name: Upload Release DSYM
-        id: upload-release-dsym
-        uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: /Users/Shared/telegram-ios/build/artifacts/Fazegram.DSYMs.zip
-          asset_name: Fazegram.DSYMs.zip
-          asset_content_type: application/zip
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload "build-$BUILD_NUMBER" \
+            /Users/Shared/telegram-ios/build/artifacts/Fazegram.DSYMs.zip
 
       - name: Save Bazel Cache
         uses: actions/cache/save@v3
