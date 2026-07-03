@@ -1043,7 +1043,9 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
         self.accountManager = accountManager
 
         telegramUIDeclareEncodables()
+        bootLog("STEP14: telegramUIDeclareEncodables done")
         initializeAccountManagement()
+        bootLog("STEP15: initializeAccountManagement done")
 
         if isUITest,
            let deleteIdx = CommandLine.arguments.firstIndex(of: "--delete-test-account"),
@@ -1081,14 +1083,17 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
             return true
         }
 
+        bootLog("STEP16: before PushRegistry")
         let pushRegistry = PKPushRegistry(queue: .main)
         if #available(iOS 9.0, *) {
             pushRegistry.desiredPushTypes = Set([.voIP])
         }
         self.pushRegistry = pushRegistry
         pushRegistry.delegate = self
+        bootLog("STEP17: PushRegistry done")
 
         self.accountManagerState = extractAccountManagerState(records: accountManager._internalAccountRecordsSync())
+        bootLog("STEP18: accountManagerState extracted")
         let _ = (accountManager.accountRecords()
         |> deliverOnMainQueue).start(next: { view in
             self.accountManagerState = extractAccountManagerState(records: view)
@@ -1100,8 +1105,10 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
                 systemUserInterfaceStyle = WindowUserInterfaceStyle(style: traitCollection.userInterfaceStyle)
             }
         }
-        
+        bootLog("STEP19: systemUserInterfaceStyle=\(systemUserInterfaceStyle)")
+
         let sharedContextSignal = currentPresentationDataAndSettings(accountManager: accountManager, systemUserInterfaceStyle: systemUserInterfaceStyle)
+        bootLog("STEP20: sharedContextSignal created")
         |> map { initialPresentationDataAndSettings -> (AccountManager, InitialPresentationDataAndSettings) in
             return (accountManager, initialPresentationDataAndSettings)
         }
