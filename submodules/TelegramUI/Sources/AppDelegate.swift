@@ -1114,16 +1114,19 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
         }
         |> deliverOnMainQueue
         |> mapToSignal { accountManager, initialPresentationDataAndSettings -> Signal<(SharedApplicationContext, LoggingSettings), NoError> in
+            bootLog("STEP20a: inside mapToSignal closure")
             self.mainWindow?.hostView.containerView.backgroundColor =  initialPresentationDataAndSettings.presentationData.theme.chatList.backgroundColor
-            
+
             let legacyBasePath = appGroupUrl.path
-            
+
             let presentationDataPromise = Promise<PresentationData>()
             let appLockContext = AppLockContextImpl(rootPath: rootPath, window: self.mainWindow!, rootController: self.window?.rootViewController, applicationBindings: applicationBindings, accountManager: accountManager, presentationDataSignal: presentationDataPromise.get(), lockIconInitialFrame: {
                 return (self.mainWindow?.viewController as? TelegramRootController)?.chatListController?.lockViewFrame
             })
-            
+            bootLog("STEP20b: AppLockContextImpl created")
+
             var setPresentationCall: ((PresentationCall?) -> Void)?
+            bootLog("STEP20c: before SharedAccountContextImpl")
             let sharedContext = SharedAccountContextImpl(mainWindow: self.mainWindow, sharedContainerPath: legacyBasePath, basePath: rootPath, encryptionParameters: encryptionParameters, accountManager: accountManager, appLockContext: appLockContext, notificationController: nil, applicationBindings: applicationBindings, initialPresentationDataAndSettings: initialPresentationDataAndSettings, networkArguments: networkArguments, hasInAppPurchases: buildConfig.isAppStoreBuild && buildConfig.apiId == 1, rootPath: rootPath, legacyBasePath: legacyBasePath, apsNotificationToken: self.notificationTokenPromise.get() |> map(Optional.init), voipNotificationToken: self.voipTokenPromise.get() |> map(Optional.init), firebaseSecretStream: self.firebaseSecretStream.get(), setNotificationCall: { call in
                 setPresentationCall?(call)
             }, navigateToChat: { accountId, peerId, messageId, alwaysKeepMessageId in
@@ -1145,7 +1148,8 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
                     }
                 }
             }, appDelegate: self, testingEnvironment: isUITest)
-            
+            bootLog("STEP20d: SharedAccountContextImpl created")
+
             presentationDataPromise.set(sharedContext.presentationData)
             
             sharedContext.presentGlobalController = { [weak self] c, a in
@@ -1233,6 +1237,7 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
                 return (sharedApplicationContext, transaction.getSharedData(SharedDataKeys.loggingSettings)?.get(LoggingSettings.self) ?? LoggingSettings.defaultSettings)
             }
         }
+        bootLog("STEP21: sharedContextSignal defined, before sharedContextPromise.set")
         self.sharedContextPromise.set(sharedContextSignal
         |> mapToSignal { sharedApplicationContext, loggingSettings -> Signal<SharedApplicationContext, NoError> in
             Logger.shared.logToFile = loggingSettings.logToFile
@@ -1241,7 +1246,8 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
             
             return .single(sharedApplicationContext)
         })
-            
+        bootLog("STEP22: sharedContextPromise.set done, before context.set")
+
         self.context.set(self.sharedContextPromise.get()
         |> deliverOnMainQueue
         |> mapToSignal { sharedApplicationContext -> Signal<AuthorizedApplicationContext?, NoError> in
@@ -1291,7 +1297,8 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
                 }
             }
         })
-        
+        bootLog("STEP23: context.set done, before authContext.set")
+
         self.authContext.set(self.sharedContextPromise.get()
         |> deliverOnMainQueue
         |> mapToSignal { sharedApplicationContext -> Signal<UnauthorizedApplicationContext?, NoError> in
@@ -1345,7 +1352,8 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
                 }
             }
         })
-        
+        bootLog("STEP24: authContext.set done, before contextDisposable")
+
         let contextReadyDisposable = MetaDisposable()
         
         let startTime = CFAbsoluteTimeGetCurrent()
@@ -1725,7 +1733,8 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
                 }))
             }
         })
-                
+
+        bootLog("STEP25: didFinishLaunchingWithOptions complete, returning true")
         return true
     }
     
