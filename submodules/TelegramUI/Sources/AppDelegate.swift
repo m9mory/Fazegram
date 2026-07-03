@@ -322,8 +322,26 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
     private var recaptchaClientsBySiteKey: [String: Promise<RecaptchaClient>] = [:]
         
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
+        // MARK: Fazegram boot log
+        let bootLogPath = NSTemporaryDirectory() + "/fazegram_boot.log"
+        func bootLog(_ msg: String) {
+            let line = "\(Date().timeIntervalSince1970) \(msg)\n"
+            if let data = line.data(using: .utf8) {
+                if let fh = FileHandle(forWritingAtPath: bootLogPath) {
+                    fh.seekToEndOfFile()
+                    fh.write(data)
+                    fh.closeFile()
+                } else {
+                    try? data.write(to: URL(fileURLWithPath: bootLogPath), options: .atomic)
+                }
+            }
+            print("[FAZEGRAM] \(msg)")
+        }
+        bootLog("STEP0: didFinishLaunchingWithOptions start")
+
         precondition(!testIsLaunched)
         testIsLaunched = true
+        bootLog("STEP1: testIsLaunched check passed")
         
         let _ = voipTokenPromise.get().start(next: { token in
             self.voipDeviceToken.set(.single(token))
@@ -528,11 +546,15 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
         let appVersion = (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String) ?? "unknown"
         
         let baseAppBundleId = Bundle.main.bundleIdentifier!
+        bootLog("STEP2: baseAppBundleId=\(baseAppBundleId)")
         let appGroupPath = sharedContainerBasePath(baseAppBundleId)
+        bootLog("STEP3: appGroupPath=\(appGroupPath)")
         let appGroupUrl = URL(fileURLWithPath: appGroupPath)
         let appGroupContainerPath = appGroupContainerBasePath(baseAppBundleId)
-        
+        bootLog("STEP4: appGroupContainerPath=\(appGroupContainerPath ?? "nil")")
+
         let buildConfig = BuildConfig(baseAppBundleId: baseAppBundleId)
+        bootLog("STEP5: BuildConfig created, apiId=\(buildConfig.apiId)")
         self.buildConfig = buildConfig
         let signatureDict = BuildConfigExtra.signatureDict()
         
@@ -667,14 +689,21 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
         } else {
             rootPath = rootPathForBasePath(appGroupPath)
         }
+        bootLog("STEP6: rootPath=\(rootPath)")
+
         if !isUITest, let appGroupContainerPath = appGroupContainerPath {
             performAppGroupUpgrades(appGroupPath: appGroupContainerPath, rootPath: rootPath)
         }
-        
+        bootLog("STEP7: appGroup upgrades done")
+
         let deviceSpecificEncryptionParameters = BuildConfig.deviceSpecificEncryptionParameters(rootPath, baseAppBundleId: baseAppBundleId)
+        bootLog("STEP8: encryption params created")
+
         let encryptionParameters = ValueBoxEncryptionParameters(forceEncryptionIfNoSet: false, key: ValueBoxEncryptionParameters.Key(data: deviceSpecificEncryptionParameters.key)!, salt: ValueBoxEncryptionParameters.Salt(data: deviceSpecificEncryptionParameters.salt)!)
-        
+        bootLog("STEP9: ValueBoxEncryptionParameters created")
+
         TempBox.initializeShared(basePath: rootPath, processType: "app", launchSpecificId: Int64.random(in: Int64.min ... Int64.max))
+        bootLog("STEP10: TempBox initialized")
         
         let writeAbilityTestFile = TempBox.shared.tempFile(fileName: "test.bin")
         var writeAbilityTestSuccess = true
@@ -700,9 +729,12 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
             writeAbilityTestSuccess = false
         }
         
+        bootLog("STEP11: writeAbilityTest=\(writeAbilityTestSuccess)")
         if !writeAbilityTestSuccess {
+            bootLog("CRASH: writeAbilityTest failed")
             let alertController = UIAlertController(title: nil, message: "The device does not have sufficient free space.", preferredStyle: .alert)
             alertController.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
+                bootLog("CRASH: preconditionFailure triggered")
                 preconditionFailure()
             }))
             self.mainWindow?.presentNative(alertController)
@@ -1005,7 +1037,9 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
             }
         })
         
+        bootLog("STEP12: before AccountManager init, rootPath=\(rootPath)")
         let accountManager = AccountManager<TelegramAccountManagerTypes>(basePath: rootPath + "/accounts-metadata", isTemporary: false, isReadOnly: false, useCaches: true, removeDatabaseOnError: true)
+        bootLog("STEP13: AccountManager initialized")
         self.accountManager = accountManager
 
         telegramUIDeclareEncodables()
