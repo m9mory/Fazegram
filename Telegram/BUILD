@@ -463,7 +463,7 @@ official_apple_pay_merchants = [
 ]
 
 official_bundle_ids = [
-    "ph.telegra.Telegraph",
+    #"ph.telegra.Telegraph",  # disabled for sideload (requires VoIP/CarPlay entitlements not in dev profile)
     "org.telegram.Telegram-iOS",
 ]
 
