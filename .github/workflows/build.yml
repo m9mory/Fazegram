@@ -116,16 +116,6 @@ jobs:
           gh release upload "build-$BUILD_NUMBER" \
             /Users/Shared/telegram-ios/build/artifacts/Fazegram.DSYMs.zip
 
-      - name: Delete Old Bazel Cache
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo "Deleting old Bazel caches, keeping key: ${{ runner.os }}-bazel-${{ github.sha }}"
-          gh cache list --key "${{ runner.os }}-bazel-" --json id,key --jq '.[] | select(.key != "${{ runner.os }}-bazel-${{ github.sha }}") | .id' | while read id; do
-            echo "Deleting cache $id"
-            gh cache delete "$id"
-          done
-
       - name: Save Bazel Cache
         uses: actions/cache/save@v3
         with:

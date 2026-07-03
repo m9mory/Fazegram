@@ -1,0 +1,176 @@
+1783088324.10203 STEP0: didFinishLaunchingWithOptions start
+1783088324.1029701 STEP1: testIsLaunched check passed
+1783088324.169643 STEP2: baseAppBundleId=ph.telegra.Telegraph
+1783088324.170963 STEP3: appGroupPath=/private/var/mobile/Containers/Shared/AppGroup/4CB0453A-170B-424D-92EA-182EE8DE8E01/LiveContainer/Data/AppGroup/group.ph.telegra.Telegraph
+1783088324.1711679 STEP4: appGroupContainerPath=/private/var/mobile/Containers/Shared/AppGroup/4CB0453A-170B-424D-92EA-182EE8DE8E01/LiveContainer/Data/AppGroup/group.ph.telegra.Telegraph
+1783088324.171596 STEP5: BuildConfig created, apiId=8
+1783088324.182127 STEP6: rootPath=/private/var/mobile/Containers/Shared/AppGroup/4CB0453A-170B-424D-92EA-182EE8DE8E01/LiveContainer/Data/AppGroup/group.ph.telegra.Telegraph/telegram-data
+1783088324.182475 STEP7: appGroup upgrades done
+1783088324.1832209 STEP8: encryption params created
+1783088324.183821 STEP9: ValueBoxEncryptionParameters created
+1783088324.185473 STEP10: TempBox initialized
+1783088324.187961 STEP11: writeAbilityTest=true
+1783088324.205855 STEP12: before AccountManager init, rootPath=/private/var/mobile/Containers/Shared/AppGroup/4CB0453A-170B-424D-92EA-182EE8DE8E01/LiveContainer/Data/AppGroup/group.ph.telegra.Telegraph/telegram-data
+1783088324.207963 STEP13: AccountManager initialized
+1783089912.526284 STEP0: didFinishLaunchingWithOptions start
+1783089912.526958 STEP1: testIsLaunched check passed
+1783089912.7389789 STEP2: baseAppBundleId=ph.telegra.Telegraph
+1783089912.7403731 STEP3: appGroupPath=/private/var/mobile/Containers/Shared/AppGroup/4CB0453A-170B-424D-92EA-182EE8DE8E01/LiveContainer/Data/AppGroup/group.ph.telegra.Telegraph
+1783089912.740574 STEP4: appGroupContainerPath=/private/var/mobile/Containers/Shared/AppGroup/4CB0453A-170B-424D-92EA-182EE8DE8E01/LiveContainer/Data/AppGroup/group.ph.telegra.Telegraph
+1783089912.74092 STEP5: BuildConfig created, apiId=8
+1783089912.750468 STEP6: rootPath=/private/var/mobile/Containers/Shared/AppGroup/4CB0453A-170B-424D-92EA-182EE8DE8E01/LiveContainer/Data/AppGroup/group.ph.telegra.Telegraph/telegram-data
+1783089912.750846 STEP7: appGroup upgrades done
+1783089912.752671 STEP8: encryption params created
+1783089912.75355 STEP9: ValueBoxEncryptionParameters created
+1783089912.755343 STEP10: TempBox initialized
+1783089912.757446 STEP11: writeAbilityTest=true
+1783089912.775207 STEP12: before AccountManager init, rootPath=/private/var/mobile/Containers/Shared/AppGroup/4CB0453A-170B-424D-92EA-182EE8DE8E01/LiveContainer/Data/AppGroup/group.ph.telegra.Telegraph/telegram-data
+1783089912.777289 STEP13: AccountManager initialized
+1783089912.778944 STEP14: telegramUIDeclareEncodables done
+1783089912.783972 STEP15: initializeAccountManagement done
+1783089912.784124 STEP16: before PushRegistry
+1783089912.78553 STEP17: PushRegistry done
+1783089912.78751 STEP18: accountManagerState extracted
+1783089912.7881951 STEP19: systemUserInterfaceStyle=dark
+1783089912.788316 STEP20: before sharedContextSignal
+1783092578.097162 STEP0: didFinishLaunchingWithOptions start
+1783092578.097655 STEP1: testIsLaunched check passed
+1783092578.166136 STEP2: baseAppBundleId=ph.telegra.Telegraph
+1783092578.167474 STEP3: appGroupPath=/private/var/mobile/Containers/Shared/AppGroup/4CB0453A-170B-424D-92EA-182EE8DE8E01/LiveContainer/Data/AppGroup/group.ph.telegra.Telegraph
+1783092578.167674 STEP4: appGroupContainerPath=/private/var/mobile/Containers/Shared/AppGroup/4CB0453A-170B-424D-92EA-182EE8DE8E01/LiveContainer/Data/AppGroup/group.ph.telegra.Telegraph
+1783092578.168003 STEP5: BuildConfig created, apiId=8
+1783092578.178874 STEP6: rootPath=/private/var/mobile/Containers/Shared/AppGroup/4CB0453A-170B-424D-92EA-182EE8DE8E01/LiveContainer/Data/AppGroup/group.ph.telegra.Telegraph/telegram-data
+1783092578.179257 STEP7: appGroup upgrades done
+1783092578.180553 STEP8: encryption params created
+1783092578.181356 STEP9: ValueBoxEncryptionParameters created
+1783092578.182421 STEP10: TempBox initialized
+1783092578.184394 STEP11: writeAbilityTest=true
+1783092578.201832 STEP12: before AccountManager init, rootPath=/private/var/mobile/Containers/Shared/AppGroup/4CB0453A-170B-424D-92EA-182EE8DE8E01/LiveContainer/Data/AppGroup/group.ph.telegra.Telegraph/telegram-data
+1783092578.203858 STEP13: AccountManager initialized
+1783092578.204833 STEP14: telegramUIDeclareEncodables done
+1783092578.209868 STEP15: initializeAccountManagement done
+1783092578.209992 STEP16: before PushRegistry
+1783092578.210973 STEP17: PushRegistry done
+1783092578.213472 STEP18: accountManagerState extracted
+1783092578.214261 STEP19: systemUserInterfaceStyle=dark
+1783092578.214376 STEP20: before sharedContextSignal
+1783092578.214899 STEP21: sharedContextSignal defined, before sharedContextPromise.set
+1783092578.215019 STEP22: sharedContextPromise.set done, before context.set
+1783092578.2151299 STEP23: context.set done, before authContext.set
+1783092578.215234 STEP24: authContext.set done, before contextDisposable
+1783092578.227905 STEP25: didFinishLaunchingWithOptions complete, returning true
+1783092578.249463 STEP20a: inside mapToSignal closure
+1783092578.250124 STEP20b: AppLockContextImpl created
+1783092578.250283 STEP20c: before SharedAccountContextImpl
+1783092578.268529 STEP20d: SharedAccountContextImpl created
+1783092647.964727 STEP0: didFinishLaunchingWithOptions start
+1783092647.964993 STEP1: testIsLaunched check passed
+1783092647.991394 STEP2: baseAppBundleId=ph.telegra.Telegraph
+1783092647.992533 STEP3: appGroupPath=/private/var/mobile/Containers/Shared/AppGroup/4CB0453A-170B-424D-92EA-182EE8DE8E01/LiveContainer/Data/AppGroup/group.ph.telegra.Telegraph
+1783092647.9927669 STEP4: appGroupContainerPath=/private/var/mobile/Containers/Shared/AppGroup/4CB0453A-170B-424D-92EA-182EE8DE8E01/LiveContainer/Data/AppGroup/group.ph.telegra.Telegraph
+1783092647.993167 STEP5: BuildConfig created, apiId=8
+1783092648.0022159 STEP6: rootPath=/private/var/mobile/Containers/Shared/AppGroup/4CB0453A-170B-424D-92EA-182EE8DE8E01/LiveContainer/Data/AppGroup/group.ph.telegra.Telegraph/telegram-data
+1783092648.002555 STEP7: appGroup upgrades done
+1783092648.002942 STEP8: encryption params created
+1783092648.003302 STEP9: ValueBoxEncryptionParameters created
+1783092648.0043669 STEP10: TempBox initialized
+1783092648.006994 STEP11: writeAbilityTest=true
+1783092648.024801 STEP12: before AccountManager init, rootPath=/private/var/mobile/Containers/Shared/AppGroup/4CB0453A-170B-424D-92EA-182EE8DE8E01/LiveContainer/Data/AppGroup/group.ph.telegra.Telegraph/telegram-data
+1783092648.02698 STEP13: AccountManager initialized
+1783092648.0290918 STEP14: telegramUIDeclareEncodables done
+1783092648.035526 STEP15: initializeAccountManagement done
+1783092648.035664 STEP16: before PushRegistry
+1783092648.0365949 STEP17: PushRegistry done
+1783092648.039537 STEP18: accountManagerState extracted
+1783092648.0405378 STEP19: systemUserInterfaceStyle=dark
+1783092648.040658 STEP20: before sharedContextSignal
+1783092648.041212 STEP21: sharedContextSignal defined, before sharedContextPromise.set
+1783092648.041347 STEP22: sharedContextPromise.set done, before context.set
+1783092648.041466 STEP23: context.set done, before authContext.set
+1783092648.0415769 STEP24: authContext.set done, before contextDisposable
+1783092648.06512 STEP25: didFinishLaunchingWithOptions complete, returning true
+1783092648.082906 STEP20a: inside mapToSignal closure
+1783092648.083627 STEP20b: AppLockContextImpl created
+1783092648.083764 STEP20c: before SharedAccountContextImpl
+1783092648.103131 STEP20d: SharedAccountContextImpl created
+1783102385.367873 STEP0: didFinishLaunchingWithOptions start
+1783102385.3749561 STEP1: testIsLaunched check passed
+1783102385.451472 STEP2: baseAppBundleId=ph.telegra.Telegraph
+1783102385.453195 STEP3: appGroupPath=/private/var/mobile/Containers/Shared/AppGroup/4CB0453A-170B-424D-92EA-182EE8DE8E01/LiveContainer/Data/AppGroup/group.ph.telegra.Telegraph
+1783102385.4533958 STEP4: appGroupContainerPath=/private/var/mobile/Containers/Shared/AppGroup/4CB0453A-170B-424D-92EA-182EE8DE8E01/LiveContainer/Data/AppGroup/group.ph.telegra.Telegraph
+1783102385.45373 STEP5: BuildConfig created, apiId=8
+1783102385.4633598 STEP6: rootPath=/private/var/mobile/Containers/Shared/AppGroup/4CB0453A-170B-424D-92EA-182EE8DE8E01/LiveContainer/Data/AppGroup/group.ph.telegra.Telegraph/telegram-data
+1783102385.463735 STEP7: appGroup upgrades done
+1783102385.4658852 STEP8: encryption params created
+1783102385.4664512 STEP9: ValueBoxEncryptionParameters created
+1783102385.4676929 STEP10: TempBox initialized
+1783102385.470461 STEP11: writeAbilityTest=true
+1783102385.499213 STEP12: before AccountManager init, rootPath=/private/var/mobile/Containers/Shared/AppGroup/4CB0453A-170B-424D-92EA-182EE8DE8E01/LiveContainer/Data/AppGroup/group.ph.telegra.Telegraph/telegram-data
+1783102385.501687 STEP13: AccountManager initialized
+1783102385.503973 STEP14: telegramUIDeclareEncodables done
+1783102385.509798 STEP15: initializeAccountManagement done
+1783102385.509925 STEP16: before PushRegistry
+1783102385.510982 STEP17: PushRegistry done
+1783102385.516887 STEP18: accountManagerState extracted
+1783102385.517695 STEP19: systemUserInterfaceStyle=dark
+1783102385.517815 STEP20: before sharedContextSignal
+1783102385.518445 STEP21: sharedContextSignal defined, before sharedContextPromise.set
+1783102385.51857 STEP22: sharedContextPromise.set done, before context.set
+1783102385.518683 STEP23: context.set done, before authContext.set
+1783102385.518791 STEP24: authContext.set done, before contextDisposable
+1783102385.5362558 STEP25: didFinishLaunchingWithOptions complete, returning true
+1783102385.556054 STEP20a: inside mapToSignal closure
+1783102385.556956 STEP20b: AppLockContextImpl created
+1783102385.5571408 STEP20c: before SharedAccountContextImpl
+1783102385.579529 STEP20d: SharedAccountContextImpl created
+1783102385.5796762 STEP20e: presentationDataPromise set
+1783102385.579784 STEP20f: before SharedNotificationManager
+1783102385.580126 STEP20g: SharedNotificationManager created
+1783102385.5802522 STEP20h: before SharedWakeupManager
+1783102385.5810041 STEP20i: SharedWakeupManager created
+1783102385.584297 STEP20j: SharedApplicationContext created
+1783104151.6541529 STEP0: didFinishLaunchingWithOptions start
+1783104151.6551251 STEP1: testIsLaunched check passed
+1783104151.7137609 STEP2: baseAppBundleId=ph.telegra.Telegraph
+1783104151.715469 STEP3: appGroupPath=/private/var/mobile/Containers/Shared/AppGroup/4CB0453A-170B-424D-92EA-182EE8DE8E01/LiveContainer/Data/AppGroup/group.ph.telegra.Telegraph
+1783104151.715678 STEP4: appGroupContainerPath=/private/var/mobile/Containers/Shared/AppGroup/4CB0453A-170B-424D-92EA-182EE8DE8E01/LiveContainer/Data/AppGroup/group.ph.telegra.Telegraph
+1783104151.7160192 STEP5: BuildConfig created, apiId=8
+1783104151.726167 STEP6: rootPath=/private/var/mobile/Containers/Shared/AppGroup/4CB0453A-170B-424D-92EA-182EE8DE8E01/LiveContainer/Data/AppGroup/group.ph.telegra.Telegraph/telegram-data
+1783104151.726633 STEP7: appGroup upgrades done
+1783104151.727607 STEP8: encryption params created
+1783104151.7281141 STEP9: ValueBoxEncryptionParameters created
+1783104151.730545 STEP10: TempBox initialized
+1783104151.7329879 STEP11: writeAbilityTest=true
+1783104151.758915 STEP12: before AccountManager init, rootPath=/private/var/mobile/Containers/Shared/AppGroup/4CB0453A-170B-424D-92EA-182EE8DE8E01/LiveContainer/Data/AppGroup/group.ph.telegra.Telegraph/telegram-data
+1783104151.761441 STEP13: AccountManager initialized
+1783104151.763648 STEP14: telegramUIDeclareEncodables done
+1783104151.7689018 STEP15: initializeAccountManagement done
+1783104151.769036 STEP16: before PushRegistry
+1783104151.77008 STEP17: PushRegistry done
+1783104151.7728372 STEP18: accountManagerState extracted
+1783104151.773689 STEP19: systemUserInterfaceStyle=dark
+1783104151.773807 STEP20: before sharedContextSignal
+1783104151.774467 STEP21: sharedContextSignal defined, before sharedContextPromise.set
+1783104151.774591 STEP22: sharedContextPromise.set done, before context.set
+1783104151.774704 STEP23: context.set done, before authContext.set
+1783104151.774812 STEP24: authContext.set done, before contextDisposable
+1783104151.787987 STEP25: didFinishLaunchingWithOptions complete, returning true
+1783104151.810971 STEP20a: inside mapToSignal closure
+1783104151.811934 STEP20b: AppLockContextImpl created
+1783104151.812119 STEP20c: before SharedAccountContextImpl
+1783104151.83285 STEP20d: SharedAccountContextImpl created
+1783104151.8329868 STEP20e: presentationDataPromise set
+1783104151.833095 STEP20f: before SharedNotificationManager
+1783104151.833468 STEP20g: SharedNotificationManager created
+1783104151.833575 STEP20h: before SharedWakeupManager
+1783104151.834398 STEP20i: SharedWakeupManager created
+1783104151.838105 STEP20j: SharedApplicationContext created
+1783104151.838325 STEP20k: overlayMediaManager attached
+1783104151.838666 STEP20l: before accountManager.transaction return
+1783104151.838851 STEP20m: inside accountManager.transaction closure
+1783104151.839374 STEP21a: inside sharedContextPromise mapToSignal, before Logger setup
+1783104151.839884 STEP21b: Logger setup done, returning .single
+1783104151.8492389 STEP23a: inside context.set mapToSignal, accessing activeAccountContexts
+1783104151.849462 STEP24a: inside authContext.set mapToSignal
+1783104151.892335 STEP23b: inside context.set map, before AuthorizedApplicationContext
+1783104151.892525 STEP25a: contextDisposable.start fired, context=nil

@@ -1442,12 +1442,13 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
         let authContextReadyDisposable = MetaDisposable()
         
         self.authContextDisposable.set((self.authContext.get()
-        |> deliverOnMainQueue).start(next: { context in
+        |> deliverOnMainQueue).start(next: { [weak self] context in
+            guard let self = self else { return }
             var network: Network?
             if let context = context {
                 network = context.account.network
             }
-            
+
             Logger.shared.log("App \(self.episodeId)", "received auth context \(String(describing: context)) account \(String(describing: context?.account.id)) network \(String(describing: network))")
             
             if let authContextValue = self.authContextValue {
@@ -1474,10 +1475,10 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
             self.authContextValue = context
             if let context = context {
                 let presentationData = context.sharedContext.currentPresentationData.with({ $0 })
-                
-                let progressSignal = Signal<Never, NoError> { [weak self] subscriber in
+
+                let progressSignal = Signal<Never, NoError> { subscriber in
                     let statusController = OverlayStatusController(theme: presentationData.theme, type: .loading(cancelled: nil))
-                    self?.mainWindow.present(statusController, on: .root)
+                    self.mainWindow.present(statusController, on: .root)
                     return ActionDisposable { [weak statusController] in
                         Queue.mainQueue().async() {
                             statusController?.dismiss()
@@ -1487,7 +1488,7 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
                 |> runOn(Queue.mainQueue())
                 |> delay(0.5, queue: Queue.mainQueue())
                 let progressDisposable = progressSignal.start()
-                
+
                 let isReady: Signal<Bool, NoError> = context.isReady.get()
                 authContextReadyDisposable.set((isReady
                 |> filter { $0 }
