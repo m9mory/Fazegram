@@ -256,13 +256,28 @@ public func rootPathForBasePath(_ appGroupPath: String) -> String {
 }
 
 public func sharedContainerBasePath(_ baseAppBundleId: String) -> String {
+    let fm = FileManager.default
+
+    // Try app group container first
     let appGroupName = "group.\(baseAppBundleId)"
-    if let appGroupUrl = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupName) {
-        return appGroupUrl.path
+    if let appGroupUrl = fm.containerURL(forSecurityApplicationGroupIdentifier: appGroupName) {
+        let testFile = appGroupUrl.path + "/.write_test"
+        if fm.fileExists(atPath: appGroupUrl.path) || fm.createFile(atPath: testFile, contents: Data(), attributes: nil) {
+            let _ = try? fm.removeItem(atPath: testFile)
+            return appGroupUrl.path
+        }
     }
-    if let documentsUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
-        return documentsUrl.path
+
+    // Fallback: check Documents is writable
+    if let documentsUrl = fm.urls(for: .documentDirectory, in: .userDomainMask).first {
+        let testFile = documentsUrl.path + "/.write_test"
+        if fm.fileExists(atPath: documentsUrl.path) || fm.createFile(atPath: testFile, contents: Data(), attributes: nil) {
+            let _ = try? fm.removeItem(atPath: testFile)
+            return documentsUrl.path
+        }
     }
+
+    // Last resort: temp directory
     return NSTemporaryDirectory()
 }
 
