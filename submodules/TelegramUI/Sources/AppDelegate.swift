@@ -1238,8 +1238,11 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
             let sharedApplicationContext = SharedApplicationContext(sharedContext: sharedContext, notificationManager: notificationManager, wakeupManager: wakeupManager)
             bootLog("STEP20j: SharedApplicationContext created")
             sharedApplicationContext.sharedContext.mediaManager.overlayMediaManager.attachOverlayMediaController(sharedApplicationContext.overlayMediaController)
-            
+            bootLog("STEP20k: overlayMediaManager attached")
+
+            bootLog("STEP20l: before accountManager.transaction return")
             return accountManager.transaction { transaction -> (SharedApplicationContext, LoggingSettings) in
+                bootLog("STEP20m: inside accountManager.transaction closure")
                 return (sharedApplicationContext, transaction.getSharedData(SharedDataKeys.loggingSettings)?.get(LoggingSettings.self) ?? LoggingSettings.defaultSettings)
             }
         }
