@@ -1151,7 +1151,8 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
             bootLog("STEP20d: SharedAccountContextImpl created")
 
             presentationDataPromise.set(sharedContext.presentationData)
-            
+            bootLog("STEP20e: presentationDataPromise set")
+
             sharedContext.presentGlobalController = { [weak self] c, a in
                 guard let strongSelf = self else {
                     return
@@ -1174,7 +1175,8 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
                     strongSelf.mainWindow.present(ThemeSettingsCrossfadeController(), on: .root)
                 }
             }
-            
+
+            bootLog("STEP20f: before SharedNotificationManager")
             let notificationManager = SharedNotificationManager(episodeId: self.episodeId, application: application, clearNotificationsManager: clearNotificationsManager, inForeground: applicationBindings.applicationInForeground, accounts: sharedContext.activeAccountContexts |> map { primary, accounts, _ in accounts.map({ ($0.1.account, $0.1.account.id == primary?.account.id) }) }, pollLiveLocationOnce: { accountId in
                 let _ = (self.context.get()
                 |> filter {
@@ -1187,6 +1189,7 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
                     }
                 })
             })
+            bootLog("STEP20g: SharedNotificationManager created")
             setPresentationCall = { call in
                 notificationManager.setNotificationCall(call, strings: sharedContext.currentPresentationData.with({ $0 }).strings)
             }
@@ -1214,6 +1217,7 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
                 }
             }
             
+            bootLog("STEP20h: before SharedWakeupManager")
             let wakeupManager = SharedWakeupManager(beginBackgroundTask: { name, expiration in
                 let id = application.beginBackgroundTask(withName: name, expirationHandler: expiration)
                 Logger.shared.log("App \(self.episodeId)", "Begin background task \(name): \(id)")
@@ -1230,7 +1234,9 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
             }, presentationData: {
                 return sharedContext.currentPresentationData.with({ $0 })
             })
+            bootLog("STEP20i: SharedWakeupManager created")
             let sharedApplicationContext = SharedApplicationContext(sharedContext: sharedContext, notificationManager: notificationManager, wakeupManager: wakeupManager)
+            bootLog("STEP20j: SharedApplicationContext created")
             sharedApplicationContext.sharedContext.mediaManager.overlayMediaManager.attachOverlayMediaController(sharedApplicationContext.overlayMediaController)
             
             return accountManager.transaction { transaction -> (SharedApplicationContext, LoggingSettings) in
