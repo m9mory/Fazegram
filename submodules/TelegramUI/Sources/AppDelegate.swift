@@ -1249,10 +1249,11 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
         bootLog("STEP21: sharedContextSignal defined, before sharedContextPromise.set")
         self.sharedContextPromise.set(sharedContextSignal
         |> mapToSignal { sharedApplicationContext, loggingSettings -> Signal<SharedApplicationContext, NoError> in
+            bootLog("STEP21a: inside sharedContextPromise mapToSignal, before Logger setup")
             Logger.shared.logToFile = loggingSettings.logToFile
             Logger.shared.logToConsole = loggingSettings.logToConsole
             Logger.shared.redactSensitiveData = loggingSettings.redactSensitiveData
-            
+            bootLog("STEP21b: Logger setup done, returning .single")
             return .single(sharedApplicationContext)
         })
         bootLog("STEP22: sharedContextPromise.set done, before context.set")
@@ -1260,6 +1261,7 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
         self.context.set(self.sharedContextPromise.get()
         |> deliverOnMainQueue
         |> mapToSignal { sharedApplicationContext -> Signal<AuthorizedApplicationContext?, NoError> in
+            bootLog("STEP23a: inside context.set mapToSignal, accessing activeAccountContexts")
             return sharedApplicationContext.sharedContext.activeAccountContexts
             |> map { primary, _, _ -> AccountContext? in
                 return primary
@@ -1293,7 +1295,9 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
             }
             |> deliverOnMainQueue
             |> map { accountAndSettings -> AuthorizedApplicationContext? in
+                bootLog("STEP23b: inside context.set map, before AuthorizedApplicationContext")
                 return accountAndSettings.flatMap { context, callListSettings in
+                    bootLog("STEP23c: creating AuthorizedApplicationContext")
                     return AuthorizedApplicationContext(sharedApplicationContext: sharedApplicationContext, mainWindow: self.mainWindow, context: context as! AccountContextImpl, accountManager: sharedApplicationContext.sharedContext.accountManager, showCallsTab: callListSettings.showTab, reinitializedNotificationSettings: {
                         let _ = (self.context.get()
                         |> take(1)
@@ -1311,6 +1315,7 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
         self.authContext.set(self.sharedContextPromise.get()
         |> deliverOnMainQueue
         |> mapToSignal { sharedApplicationContext -> Signal<UnauthorizedApplicationContext?, NoError> in
+            bootLog("STEP24a: inside authContext.set mapToSignal")
             return sharedApplicationContext.sharedContext.activeAccountContexts
             |> map { primary, accounts, auth -> (AccountContext?, UnauthorizedAccount, [AccountContext])? in
                 if let auth = auth {
@@ -1368,6 +1373,7 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
         let startTime = CFAbsoluteTimeGetCurrent()
         self.contextDisposable.set((self.context.get()
         |> deliverOnMainQueue).start(next: { context in
+            bootLog("STEP25a: contextDisposable.start fired, context=\(context != nil ? "exists" : "nil")")
             print("Application: context took \(CFAbsoluteTimeGetCurrent() - startTime) to become available")
             
             var network: Network?
@@ -1391,6 +1397,7 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
                 |> filter { $0 }
                 |> take(1)
                 |> deliverOnMainQueue).start(next: { _ in
+                    bootLog("STEP25b: context.isReady fired")
                     let readyTime = CFAbsoluteTimeGetCurrent() - startTime
                     if readyTime > 0.5 {
                         print("Application: context took \(readyTime) to become ready")
@@ -1399,6 +1406,7 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
 
                     self.mainWindow.debugAction = nil
                     self.mainWindow.viewController = context.rootController
+                    bootLog("STEP25c: rootController set")
                     
                     if firstTime {
                         let layer = context.rootController.view.layer
@@ -1409,12 +1417,17 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
                             }
                         })
                     }
+                    bootLog("STEP25d: overlay controllers setup")
                     self.mainWindow.topLevelOverlayControllers = [context.sharedApplicationContext.overlayMediaController, context.notificationController]
                     (context.context.sharedContext as? SharedAccountContextImpl)?.notificationController = context.notificationController
                     var authorizeNotifications = true
                     if #available(iOS 10.0, *) {
                         authorizeNotifications = false
+                    bootLog("STEP25e: before registerForNotifications")
                     }
+                    bootLog("STEP25f: registerForNotifications done")
+                    bootLog("STEP25g: resetIntents done")
+                    bootLog("STEP25h: context ready complete")
                     self.registerForNotifications(context: context.context, authorize: authorizeNotifications)
                     
                     self.resetIntentsIfNeeded(context: context.context)
