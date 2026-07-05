@@ -94,26 +94,28 @@ final class UnauthorizedApplicationContext {
         })
         fazegramBootLog("UAC7: shouldBeServiceTaskMaster set")
 
-        DeviceAccess.authorizeAccess(to: .cellularData, presentationData: sharedContext.currentPresentationData.with { $0 }, present: { [weak self] c, a in
-            if let strongSelf = self {
-                (strongSelf.rootController.viewControllers.last as? ViewController)?.present(c, in: .window(.root))
-            }
-        }, openSettings: {
-            sharedContext.applicationBindings.openSettings()
-        }, { result in
-            ApplicationSpecificNotice.setPermissionWarning(accountManager: sharedContext.accountManager, permission: .cellularData, value: 0)
-        })
-        fazegramBootLog("UAC8: DeviceAccess authorizeAccess called")
+        // Disabled for LiveContainer sideload compatibility
+        //DeviceAccess.authorizeAccess(to: .cellularData, presentationData: sharedContext.currentPresentationData.with { $0 }, present: { [weak self] c, a in
+        //    if let strongSelf = self {
+        //        (strongSelf.rootController.viewControllers.last as? ViewController)?.present(c, in: .window(.root))
+        //    }
+        //}, openSettings: {
+        //    sharedContext.applicationBindings.openSettings()
+        //}, { result in
+        //    ApplicationSpecificNotice.setPermissionWarning(accountManager: sharedContext.accountManager, permission: .cellularData, value: 0)
+        //})
+        fazegramBootLog("UAC8: DeviceAccess authorizeAccess skipped (sideload)")
 
-        self.serviceNotificationEventsDisposable = (account.serviceNotificationEvents
-        |> deliverOnMainQueue).start(next: { [weak self] text in
-            if let strongSelf = self {
-                let presentationData = strongSelf.sharedContext.currentPresentationData.with { $0 }
-                let alertController = textAlertController(sharedContext: strongSelf.sharedContext, title: nil, text: text, actions: [TextAlertAction(type: .defaultAction, title: presentationData.strings.Common_OK, action: {})])
-
-                (strongSelf.rootController.viewControllers.last as? ViewController)?.present(alertController, in: .window(.root))
-            }
-        })
+        // Disabled for LiveContainer sideload compatibility
+        //self.serviceNotificationEventsDisposable = (account.serviceNotificationEvents
+        //|> deliverOnMainQueue).start(next: { [weak self] text in
+        //    if let strongSelf = self {
+        //        let presentationData = strongSelf.sharedContext.currentPresentationData.with { $0 }
+        //        let alertController = textAlertController(sharedContext: strongSelf.sharedContext, title: nil, text: text, actions: [TextAlertAction(type: .defaultAction, title: presentationData.strings.Common_OK, action: {})])
+        //
+        //        (strongSelf.rootController.viewControllers.last as? ViewController)?.present(alertController, in: .window(.root))
+        //    }
+        //})
         fazegramBootLog("UAC9: UnauthorizedApplicationContext init done")
     }
 
