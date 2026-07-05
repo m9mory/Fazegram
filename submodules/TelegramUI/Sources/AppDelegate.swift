@@ -1477,29 +1477,8 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
             self.authContextValue = context
             if let context = context {
                 Queue.mainQueue().async {
-                    let presentationData = context.sharedContext.currentPresentationData.with({ $0 })
-
-                    let progressSignal = Signal<Never, NoError> { subscriber in
-                        let statusController = OverlayStatusController(theme: presentationData.theme, type: .loading(cancelled: nil))
-                        self.mainWindow.present(statusController, on: .root)
-                        return ActionDisposable { [weak statusController] in
-                            Queue.mainQueue().async() {
-                                statusController?.dismiss()
-                            }
-                        }
-                    }
-                    |> runOn(Queue.mainQueue())
-                    |> delay(0.5, queue: Queue.mainQueue())
-                    let progressDisposable = progressSignal.start()
-
-                    let isReady: Signal<Bool, NoError> = context.isReady.get()
-                    authContextReadyDisposable.set((isReady
-                    |> filter { $0 }
-                    |> take(1)
-                    |> deliverOnMainQueue).start(next: { _ in
-                        progressDisposable.dispose()
-                        self.mainWindow.present(context.rootController, on: .root)
-                    }))
+                    bootLog("STEP25a3: setting auth viewController directly")
+                    self.mainWindow.viewController = context.rootController
                 }
             } else {
                 authContextReadyDisposable.set(nil)
