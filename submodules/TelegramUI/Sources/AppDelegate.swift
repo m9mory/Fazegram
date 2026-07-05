@@ -1444,7 +1444,8 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
         
         self.authContextDisposable.set((self.authContext.get()
         |> deliverOnMainQueue).start(next: { [weak self] context in
-            guard let self = self else { return }
+            guard let self = self else { bootLog("AUTH_CTX: self is nil!"); return }
+            bootLog("STEP25a2: authContext subscriber fired, context=\(context != nil ? "exists" : "nil")")
             var network: Network?
             if let context = context {
                 network = context.account.network
