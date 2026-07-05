@@ -99,10 +99,11 @@ public final class AuthorizationSequenceController: NavigationController, ASAuth
 
         authBootLog("AUTH_SEQ2: before super.init")
         super.init(mode: .single, theme: NavigationControllerTheme(statusBar: navigationStatusBar, navigationBar: AuthorizationSequenceController.navigationBarTheme(presentationData.theme), emptyAreaColor: .black), isFlat: true)
-        authBootLog("AUTH_SEQ3: super.init done, before InAppPurchaseManager")
+        authBootLog("AUTH_SEQ3: super.init done, skipping InAppPurchaseManager for sideload")
 
-        self.inAppPurchaseManager = InAppPurchaseManager(engine: .unauthorized(self.engine))
-        authBootLog("AUTH_SEQ4: InAppPurchaseManager created, before auth.state")
+        // Disabled for LiveContainer sideload - StoreKit crashes in jailed environment
+        // self.inAppPurchaseManager = InAppPurchaseManager(engine: .unauthorized(self.engine))
+        authBootLog("AUTH_SEQ4: InAppPurchaseManager skipped (sideload), before auth.state")
 
         self.stateDisposable = (self.engine.auth.state()
         |> map { state -> InnerState in
@@ -214,7 +215,7 @@ public final class AuthorizationSequenceController: NavigationController, ASAuth
                     return
                 }
                 strongSelf.account = updatedAccount
-                strongSelf.inAppPurchaseManager = InAppPurchaseManager(engine: .unauthorized(strongSelf.engine))
+                // sideload: lazy init in paymentController
             }
             controller.loginWithNumber = { [weak self, weak controller] number, syncContacts in
                 guard let self else {
@@ -240,7 +241,7 @@ public final class AuthorizationSequenceController: NavigationController, ASAuth
                                 case let .sentCode(account):
                                     controller?.inProgress = false
                                     strongSelf.account = account
-                                    strongSelf.inAppPurchaseManager = InAppPurchaseManager(engine: .unauthorized(strongSelf.engine))
+                                    // sideload: lazy init in paymentController
                                 case .loggedIn:
                                     break
                                 }
@@ -361,7 +362,7 @@ public final class AuthorizationSequenceController: NavigationController, ASAuth
                     }
                     if result.updatedAccount !== self.account {
                         self.account = result.updatedAccount
-                        self.inAppPurchaseManager = InAppPurchaseManager(engine: .unauthorized(self.engine))
+                        // sideload: lazy init in paymentController
                     }
                 }, error: { [weak self, weak controller] error in
                     Queue.mainQueue().async {
@@ -832,6 +833,9 @@ public final class AuthorizationSequenceController: NavigationController, ASAuth
     }
     
     private func paymentController(number: String, phoneCodeHash: String, storeProduct: String, premiumDays: Int32, supportEmailAddress: String, supportEmailSubject: String) -> AuthorizationSequencePaymentScreen {
+        if self.inAppPurchaseManager == nil {
+            self.inAppPurchaseManager = InAppPurchaseManager(engine: .unauthorized(self.engine))
+        }
         let controller = AuthorizationSequencePaymentScreen(sharedContext: self.sharedContext, engine: self.engine, presentationData: self.presentationData, inAppPurchaseManager: self.inAppPurchaseManager, phoneNumber: number, phoneCodeHash: phoneCodeHash, storeProduct: storeProduct, premiumDays: premiumDays, supportEmailAddress: supportEmailAddress, supportEmailSubject: supportEmailSubject, back: { [weak self] in
             guard let self else {
                 return
