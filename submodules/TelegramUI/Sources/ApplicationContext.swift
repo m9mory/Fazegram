@@ -8,6 +8,21 @@ import Postbox
 import TelegramCore
 import Display
 import LegacyComponents
+
+let fazegramBootLogPath = NSTemporaryDirectory() + "/fazegram_boot.log"
+func fazegramBootLog(_ msg: String) {
+    let line = "\(Date().timeIntervalSince1970) \(msg)\n"
+    if let data = line.data(using: .utf8) {
+        if let fh = FileHandle(forWritingAtPath: fazegramBootLogPath) {
+            fh.seekToEndOfFile()
+            fh.write(data)
+            fh.closeFile()
+        } else {
+            try? data.write(to: URL(fileURLWithPath: fazegramBootLogPath), options: .atomic)
+        }
+    }
+    print("[FAZEGRAM] \(msg)")
+}
 import DeviceAccess
 import TelegramUpdateUI
 import AccountContext
@@ -47,23 +62,29 @@ final class UnauthorizedApplicationContext {
     private var serviceNotificationEventsDisposable: Disposable?
     
     init(apiId: Int32, apiHash: String, sharedContext: SharedAccountContextImpl, account: UnauthorizedAccount, otherAccountPhoneNumbers: ((String, AccountRecordId, Bool)?, [(String, AccountRecordId, Bool)])) {
+        fazegramBootLog("UAC1: UnauthorizedApplicationContext init start")
         self.sharedContext = sharedContext
         self.account = account
+        fazegramBootLog("UAC2: getting presentationData")
         let presentationData = sharedContext.currentPresentationData.with { $0 }
-        
+
         var authorizationCompleted: (() -> Void)?
-        
+
+        fazegramBootLog("UAC3: before AuthorizationSequenceController")
         self.rootController = AuthorizationSequenceController(sharedContext: sharedContext, account: account, otherAccountPhoneNumbers: otherAccountPhoneNumbers, presentationData: presentationData, openUrl: sharedContext.applicationBindings.openUrl, apiId: apiId, apiHash: apiHash, authorizationCompleted: {
             authorizationCompleted?()
         })
+        fazegramBootLog("UAC4: AuthorizationSequenceController created")
         (self.rootController as NavigationController).statusBarHost = sharedContext.mainWindow?.statusBarHost
-        
+        fazegramBootLog("UAC5: statusBarHost set")
+
         authorizationCompleted = { [weak self] in
             self?.authorizationCompleted = true
         }
-        
+
         self.isReady.set(self.rootController.ready.get())
-        
+        fazegramBootLog("UAC6: isReady set")
+
         account.shouldBeServiceTaskMaster.set(sharedContext.applicationBindings.applicationInForeground |> map { value -> AccountServiceTaskMasterMode in
             if value {
                 return .always
@@ -71,7 +92,8 @@ final class UnauthorizedApplicationContext {
                 return .never
             }
         })
-        
+        fazegramBootLog("UAC7: shouldBeServiceTaskMaster set")
+
         DeviceAccess.authorizeAccess(to: .cellularData, presentationData: sharedContext.currentPresentationData.with { $0 }, present: { [weak self] c, a in
             if let strongSelf = self {
                 (strongSelf.rootController.viewControllers.last as? ViewController)?.present(c, in: .window(.root))
@@ -81,6 +103,7 @@ final class UnauthorizedApplicationContext {
         }, { result in
             ApplicationSpecificNotice.setPermissionWarning(accountManager: sharedContext.accountManager, permission: .cellularData, value: 0)
         })
+        fazegramBootLog("UAC8: DeviceAccess authorizeAccess called")
 
         self.serviceNotificationEventsDisposable = (account.serviceNotificationEvents
         |> deliverOnMainQueue).start(next: { [weak self] text in
@@ -91,6 +114,7 @@ final class UnauthorizedApplicationContext {
                 (strongSelf.rootController.viewControllers.last as? ViewController)?.present(alertController, in: .window(.root))
             }
         })
+        fazegramBootLog("UAC9: UnauthorizedApplicationContext init done")
     }
 
     deinit {
