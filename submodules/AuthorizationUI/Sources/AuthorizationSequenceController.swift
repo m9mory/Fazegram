@@ -3,6 +3,21 @@ import UIKit
 import AsyncDisplayKit
 import Display
 import TelegramCore
+
+private func authBootLog(_ msg: String) {
+    let line = "\(Date().timeIntervalSince1970) \(msg)\n"
+    let path = NSTemporaryDirectory() + "/fazegram_boot.log"
+    if let data = line.data(using: .utf8) {
+        if let fh = FileHandle(forWritingAtPath: path) {
+            fh.seekToEndOfFile()
+            fh.write(data)
+            fh.closeFile()
+        } else {
+            try? data.write(to: URL(fileURLWithPath: path), options: .atomic)
+        }
+    }
+    print("[FAZEGRAM] \(msg)")
+}
 import SwiftSignalKit
 import MtProtoKit
 import MessageUI
@@ -64,6 +79,7 @@ public final class AuthorizationSequenceController: NavigationController, ASAuth
     private var inAppPurchaseManager: InAppPurchaseManager!
     
     public init(sharedContext: SharedAccountContext, account: UnauthorizedAccount, otherAccountPhoneNumbers: ((String, AccountRecordId, Bool)?, [(String, AccountRecordId, Bool)]), presentationData: PresentationData, openUrl: @escaping (String) -> Void, apiId: Int32, apiHash: String, authorizationCompleted: @escaping () -> Void) {
+        authBootLog("AUTH_SEQ1: init start")
         self.sharedContext = sharedContext
         self.account = account
         self.otherAccountPhoneNumbers = otherAccountPhoneNumbers
@@ -72,7 +88,7 @@ public final class AuthorizationSequenceController: NavigationController, ASAuth
         self.presentationData = presentationData
         self.openUrl = openUrl
         self.authorizationCompleted = authorizationCompleted
-        
+
         let navigationStatusBar: NavigationStatusBarStyle
         switch presentationData.theme.rootController.statusBarStyle {
         case .black:
@@ -80,11 +96,14 @@ public final class AuthorizationSequenceController: NavigationController, ASAuth
         case .white:
             navigationStatusBar = .white
         }
-        
+
+        authBootLog("AUTH_SEQ2: before super.init")
         super.init(mode: .single, theme: NavigationControllerTheme(statusBar: navigationStatusBar, navigationBar: AuthorizationSequenceController.navigationBarTheme(presentationData.theme), emptyAreaColor: .black), isFlat: true)
-        
+        authBootLog("AUTH_SEQ3: super.init done, before InAppPurchaseManager")
+
         self.inAppPurchaseManager = InAppPurchaseManager(engine: .unauthorized(self.engine))
-        
+        authBootLog("AUTH_SEQ4: InAppPurchaseManager created, before auth.state")
+
         self.stateDisposable = (self.engine.auth.state()
         |> map { state -> InnerState in
             if case .authorized = state {
@@ -97,9 +116,11 @@ public final class AuthorizationSequenceController: NavigationController, ASAuth
         }
         |> distinctUntilChanged
         |> deliverOnMainQueue).startStrict(next: { [weak self] state in
+            authBootLog("AUTH_STATE: received state, calling updateState")
             self?.updateState(state: state)
         }).strict()
-        
+        authBootLog("AUTH_SEQ5: auth.state signal started")
+
         self.applicationStateDisposable = (self.sharedContext.applicationBindings.applicationIsActive
         |> deliverOnMainQueue).start(next: { [weak self] isActive in
             guard let self else {
@@ -111,6 +132,7 @@ public final class AuthorizationSequenceController: NavigationController, ASAuth
                 }
             }
         })
+        authBootLog("AUTH_SEQ6: init done")
     }
     
     required public init(coder aDecoder: NSCoder) {
@@ -1243,6 +1265,7 @@ public final class AuthorizationSequenceController: NavigationController, ASAuth
     }
     
     private func updateState(state: InnerState) {
+        authBootLog("AUTH_updateState: \(state)")
         switch state {
         case .authorized:
             self.authorizationCompleted()
