@@ -2,6 +2,7 @@ import Foundation
 import UIKit
 import Display
 import AccountContext
+import TelegramCore
 import TelegramPresentationData
 
 // MARK: - Экран Ghost Mode
@@ -74,6 +75,7 @@ private struct GhostModeArguments {
 public func ghostModeSettingsController(context: AccountContext) -> ViewController {
     let arguments = GhostModeArguments(
         toggleHideReadReceipts: { value in
+            FazeGramSettings.shared.hideReadReceipts = value
             let _ = updateFazeGramSettings(accountManager: context.sharedContext.accountManager, { settings in
                 var s = settings
                 s.hideReadReceipts = value
@@ -81,6 +83,7 @@ public func ghostModeSettingsController(context: AccountContext) -> ViewControll
             }).start()
         },
         toggleHideStoryViews: { value in
+            FazeGramSettings.shared.hideStoryViews = value
             let _ = updateFazeGramSettings(accountManager: context.sharedContext.accountManager, { settings in
                 var s = settings
                 s.hideStoryViews = value
@@ -88,6 +91,7 @@ public func ghostModeSettingsController(context: AccountContext) -> ViewControll
             }).start()
         },
         toggleHideOnline: { value in
+            FazeGramSettings.shared.hideOnline = value
             let _ = updateFazeGramSettings(accountManager: context.sharedContext.accountManager, { settings in
                 var s = settings
                 s.hideOnline = value
