@@ -258,22 +258,22 @@ public func rootPathForBasePath(_ appGroupPath: String) -> String {
 public func sharedContainerBasePath(_ baseAppBundleId: String) -> String {
     let fm = FileManager.default
 
-    // Try app group container first
+    // Try Documents first (works better for sideloaded apps - SideStore, LiveContainer)
+    if let documentsUrl = fm.urls(for: .documentDirectory, in: .userDomainMask).first {
+        let testFile = documentsUrl.path + "/.write_test"
+        if fm.fileExists(atPath: documentsUrl.path) || fm.createFile(atPath: testFile, contents: Data(), attributes: nil) {
+            let _ = try? fm.removeItem(atPath: testFile)
+            return documentsUrl.path
+        }
+    }
+
+    // Fallback: try app group container
     let appGroupName = "group.\(baseAppBundleId)"
     if let appGroupUrl = fm.containerURL(forSecurityApplicationGroupIdentifier: appGroupName) {
         let testFile = appGroupUrl.path + "/.write_test"
         if fm.fileExists(atPath: appGroupUrl.path) || fm.createFile(atPath: testFile, contents: Data(), attributes: nil) {
             let _ = try? fm.removeItem(atPath: testFile)
             return appGroupUrl.path
-        }
-    }
-
-    // Fallback: check Documents is writable
-    if let documentsUrl = fm.urls(for: .documentDirectory, in: .userDomainMask).first {
-        let testFile = documentsUrl.path + "/.write_test"
-        if fm.fileExists(atPath: documentsUrl.path) || fm.createFile(atPath: testFile, contents: Data(), attributes: nil) {
-            let _ = try? fm.removeItem(atPath: testFile)
-            return documentsUrl.path
         }
     }
 
