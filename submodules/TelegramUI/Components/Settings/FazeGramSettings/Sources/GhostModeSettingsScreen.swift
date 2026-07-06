@@ -1,133 +1,175 @@
 import Foundation
 import UIKit
 import Display
-import ItemListUI
-import SwiftSignalKit
 import AccountContext
 import TelegramCore
 import TelegramPresentationData
-import TelegramUIPreferences
-
-// MARK: - Экран Ghost Mode
-
-private enum GhostModeEntry: ItemListNodeEntry {
-    case hideReadReceipts(Bool)
-    case hideStoryViews(Bool)
-    case hideOnline(Bool)
-
-    var section: ItemListSectionId { return 0 }
-
-    var stableId: Int {
-        switch self {
-        case .hideReadReceipts: return 0
-        case .hideStoryViews: return 1
-        case .hideOnline: return 2
-        }
-    }
-
-    static func < (lhs: GhostModeEntry, rhs: GhostModeEntry) -> Bool {
-        return lhs.stableId < rhs.stableId
-    }
-
-    func item(presentationData: ItemListPresentationData, arguments: Any) -> ListViewItem {
-        let arguments = arguments as! GhostModeArguments
-        switch self {
-        case let .hideReadReceipts(value):
-            return ItemListSwitchItem(
-                presentationData: presentationData,
-                title: "Скрыть прочтение",
-                value: value,
-                sectionId: self.section,
-                style: .blocks,
-                updated: { newValue in
-                    arguments.toggleHideReadReceipts(newValue)
-                }
-            )
-        case let .hideStoryViews(value):
-            return ItemListSwitchItem(
-                presentationData: presentationData,
-                title: "Скрыть просмотр сторис",
-                value: value,
-                sectionId: self.section,
-                style: .blocks,
-                updated: { newValue in
-                    arguments.toggleHideStoryViews(newValue)
-                }
-            )
-        case let .hideOnline(value):
-            return ItemListSwitchItem(
-                presentationData: presentationData,
-                title: "Скрыть онлайн",
-                value: value,
-                sectionId: self.section,
-                style: .blocks,
-                updated: { newValue in
-                    arguments.toggleHideOnline(newValue)
-                }
-            )
-        }
-    }
-}
-
-private struct GhostModeArguments {
-    let toggleHideReadReceipts: (Bool) -> Void
-    let toggleHideStoryViews: (Bool) -> Void
-    let toggleHideOnline: (Bool) -> Void
-}
+import SwiftSignalKit
 
 public func ghostModeSettingsController(context: AccountContext) -> ViewController {
-    let arguments = GhostModeArguments(
-        toggleHideReadReceipts: { value in
-            FazeGramSettings.shared.hideReadReceipts = value
-            let _ = updateFazeGramSettings(accountManager: context.sharedContext.accountManager, { settings in
-                var s = settings
-                s.hideReadReceipts = value
-                return s
-            }).start()
-        },
-        toggleHideStoryViews: { value in
-            FazeGramSettings.shared.hideStoryViews = value
-            let _ = updateFazeGramSettings(accountManager: context.sharedContext.accountManager, { settings in
-                var s = settings
-                s.hideStoryViews = value
-                return s
-            }).start()
-        },
-        toggleHideOnline: { value in
-            FazeGramSettings.shared.hideOnline = value
-            let _ = updateFazeGramSettings(accountManager: context.sharedContext.accountManager, { settings in
-                var s = settings
-                s.hideOnline = value
-                return s
-            }).start()
+    let presentationData = context.sharedContext.currentPresentationData.with { $0 }
+    let theme = presentationData.theme
+    let strings = presentationData.strings
+
+    class GhostModeController: ViewController {
+        private let context: AccountContext
+        private var hideReadReceipts: Bool = FazeGramSettings.shared.hideReadReceipts
+        private var hideStoryViews: Bool = FazeGramSettings.shared.hideStoryViews
+        private var hideOnline: Bool = FazeGramSettings.shared.hideOnline
+
+        init(context: AccountContext) {
+            self.context = context
+            super.init(navigationBarPresentationData: NavigationBarPresentationData(
+                theme: NavigationBarTheme(
+                    overallDarkAppearance: theme.overallDarkAppearance,
+                    buttonColor: theme.rootController.navigationBar.accentTextColor,
+                    disabledButtonColor: theme.rootController.navigationBar.disabledButtonColor,
+                    primaryTextColor: theme.rootController.navigationBar.primaryTextColor,
+                    backgroundColor: .clear,
+                    opaqueBackgroundColor: .clear,
+                    enableBackgroundBlur: false,
+                    separatorColor: .clear,
+                    badgeBackgroundColor: theme.rootController.navigationBar.badgeBackgroundColor,
+                    badgeStrokeColor: theme.rootController.navigationBar.badgeStrokeColor,
+                    badgeTextColor: theme.rootController.navigationBar.badgeTextColor,
+                    edgeEffectColor: .clear,
+                    accentButtonColor: theme.rootController.navigationBar.accentTextColor,
+                    accentDisabledButtonColor: theme.rootController.navigationBar.disabledButtonColor,
+                    accentForegroundColor: theme.rootController.navigationBar.accentTextColor,
+                    style: .solid
+                ),
+                strings: NavigationBarStrings(
+                    back: "Fazegram",
+                    close: strings.Common_Close
+                )
+            ))
+            self.title = "Fazegram"
         }
-    )
 
-    let signal = fazeGramSettings(accountManager: context.sharedContext.accountManager)
-    |> map { settings -> (ItemListControllerState, (ItemListNodeState, Any)) in
-        let entries: [GhostModeEntry] = [
-            .hideReadReceipts(settings.hideReadReceipts),
-            .hideStoryViews(settings.hideStoryViews),
-            .hideOnline(settings.hideOnline)
-        ]
+        required init(coder aDecoder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
 
-        let presentationData = context.sharedContext.currentPresentationData.with { $0 }
-        let controllerState = ItemListControllerState(
-            presentationData: ItemListPresentationData(presentationData),
-            title: .text("Режим призрака"),
-            leftNavigationButton: nil,
-            rightNavigationButton: nil,
-            backNavigationButton: ItemListBackButton(title: "Fazegram")
-        )
+        override func loadDisplayNode() {
+            self.displayNode = ASDisplayNode()
+            self.displayNode.backgroundColor = theme.list.plainBackgroundColor
+            self.displayNodeDidLoad()
+        }
 
-        let listState = ItemListNodeState(
-            presentationData: ItemListPresentationData(presentationData),
-            entries: entries,
-            style: .blocks
-        )
+        override func containerLayoutUpdated(_ layout: ContainerViewLayout, transition: ContainedViewLayoutTransition) {
+            super.containerLayoutUpdated(layout, transition: transition)
 
-        return (controllerState, (listState, arguments))
+            if let scrollNode = self.displayNode.view.subviews.first as? UIScrollView {
+                scrollNode.frame = CGRect(origin: .zero, size: layout.size)
+            } else {
+                setupUI(layout: layout)
+            }
+        }
+
+        private func setupUI(layout: ContainerViewLayout) {
+            let scrollView = UIScrollView(frame: CGRect(origin: .zero, size: layout.size))
+            scrollView.alwaysBounceVertical = true
+            scrollView.backgroundColor = theme.list.plainBackgroundColor
+
+            let items: [(String, Bool, (Bool) -> Void)] = [
+                (title: "Скрыть прочтение", value: hideReadReceipts, toggle: { [weak self] v in
+                    self?.hideReadReceipts = v
+                    FazeGramSettings.shared.hideReadReceipts = v
+                    let _ = updateFazeGramSettings(accountManager: context.sharedContext.accountManager) { settings in
+                        var s = settings
+                        s.hideReadReceipts = v
+                        return s
+                    }.start()
+                }),
+                (title: "Скрыть просмотр сторис", value: hideStoryViews, toggle: { [weak self] v in
+                    self?.hideStoryViews = v
+                    FazeGramSettings.shared.hideStoryViews = v
+                    let _ = updateFazeGramSettings(accountManager: context.sharedContext.accountManager) { settings in
+                        var s = settings
+                        s.hideStoryViews = v
+                        return s
+                    }.start()
+                }),
+                (title: "Скрыть онлайн", value: hideOnline, toggle: { [weak self] v in
+                    self?.hideOnline = v
+                    FazeGramSettings.shared.hideOnline = v
+                    let _ = updateFazeGramSettings(accountManager: context.sharedContext.accountManager) { settings in
+                        var s = settings
+                        s.hideOnline = v
+                        return s
+                    }.start()
+                }),
+            ]
+
+            var y: CGFloat = 20.0
+            let itemHeight: CGFloat = 44.0
+            let width = layout.size.width
+
+            for (index, item) in items.enumerated() {
+                let hasTopRadius = index == 0
+                let hasBottomRadius = index == items.count - 1
+
+                let container = UIView(frame: CGRect(x: 16, y: y, width: width - 32, height: itemHeight))
+                container.backgroundColor = theme.list.itemBlocksBackgroundColor
+
+                if hasTopRadius && hasBottomRadius {
+                    container.layer.cornerRadius = 10
+                    container.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner, .layerMinXMaxYCorner, .layerMaxXMaxYCorner]
+                } else if hasTopRadius {
+                    container.layer.cornerRadius = 10
+                    container.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+                } else if hasBottomRadius {
+                    container.layer.cornerRadius = 10
+                    container.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
+                }
+                container.clipsToBounds = true
+
+                let label = UILabel(frame: CGRect(x: 16, y: 0, width: container.bounds.width - 80, height: itemHeight))
+                label.text = item.0
+                label.font = Font.regular(17.0)
+                label.textColor = theme.list.itemPrimaryTextColor
+                container.addSubview(label)
+
+                let toggle = UISwitch()
+                toggle.isOn = item.1
+                toggle.onTintColor = theme.list.itemAccentColor
+                toggle.frame = CGRect(x: container.bounds.width - 67, y: (itemHeight - 31) / 2, width: 51, height: 31)
+                toggle.tag = index
+                toggle.addTarget(self, action: #selector(switchChanged(_:)), for: .valueChanged)
+                container.addSubview(toggle)
+
+                scrollView.addSubview(container)
+                y += itemHeight + 1
+            }
+
+            self.displayNode.view.addSubview(scrollView)
+        }
+
+        @objc private func switchChanged(_ sender: UISwitch) {
+            let items: [(Bool, inout Bool)] = [
+                (hideReadReceipts, &hideReadReceipts),
+                (hideStoryViews, &hideStoryViews),
+                (hideOnline, &hideOnline),
+            ]
+            guard sender.tag < items.count else { return }
+            let newValue = sender.isOn
+            switch sender.tag {
+            case 0:
+                hideReadReceipts = newValue
+                FazeGramSettings.shared.hideReadReceipts = newValue
+                let _ = updateFazeGramSettings(accountManager: context.sharedContext.accountManager) { s in var s = s; s.hideReadReceipts = newValue; return s }.start()
+            case 1:
+                hideStoryViews = newValue
+                FazeGramSettings.shared.hideStoryViews = newValue
+                let _ = updateFazeGramSettings(accountManager: context.sharedContext.accountManager) { s in var s = s; s.hideStoryViews = newValue; return s }.start()
+            case 2:
+                hideOnline = newValue
+                FazeGramSettings.shared.hideOnline = newValue
+                let _ = updateFazeGramSettings(accountManager: context.sharedContext.accountManager) { s in var s = s; s.hideOnline = newValue; return s }.start()
+            default: break
+            }
+        }
     }
 
-    return ItemListController(context: context, state: signal)
+    return GhostModeController(context: context)
 }
