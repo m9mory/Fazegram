@@ -29,6 +29,8 @@ private final class GhostModeController: ViewController {
         setupUI()
     }
 
+    private var switchChangedActions: [(Bool) -> Void] = []
+
     private func setupUI() {
         let theme = presentationDataValue.theme
         let scrollView = UIScrollView(frame: self.displayNode.bounds)
@@ -39,7 +41,8 @@ private final class GhostModeController: ViewController {
             (
                 title: "Скрыть прочтение",
                 get: { FazeGramSettings.shared.hideReadReceipts },
-                set: { v in
+                set: { [weak self] v in
+                    guard let self = self else { return }
                     FazeGramSettings.shared.hideReadReceipts = v
                     let _ = updateFazeGramSettings(accountManager: self.ctx.sharedContext.accountManager) { s in var s = s; s.hideReadReceipts = v; return s }.start()
                 }
@@ -47,7 +50,8 @@ private final class GhostModeController: ViewController {
             (
                 title: "Скрыть просмотр сторис",
                 get: { FazeGramSettings.shared.hideStoryViews },
-                set: { v in
+                set: { [weak self] v in
+                    guard let self = self else { return }
                     FazeGramSettings.shared.hideStoryViews = v
                     let _ = updateFazeGramSettings(accountManager: self.ctx.sharedContext.accountManager) { s in var s = s; s.hideStoryViews = v; return s }.start()
                 }
@@ -55,18 +59,21 @@ private final class GhostModeController: ViewController {
             (
                 title: "Скрыть онлайн",
                 get: { FazeGramSettings.shared.hideOnline },
-                set: { v in
+                set: { [weak self] v in
+                    guard let self = self else { return }
                     FazeGramSettings.shared.hideOnline = v
                     let _ = updateFazeGramSettings(accountManager: self.ctx.sharedContext.accountManager) { s in var s = s; s.hideOnline = v; return s }.start()
                 }
             ),
         ]
 
+        self.switchChangedActions = items.map { $0.set }
+
         var y: CGFloat = 20.0
         let itemHeight: CGFloat = 44.0
         let width = self.displayNode.bounds.width
 
-        for (_, item) in items.enumerated() {
+        for (index, item) in items.enumerated() {
             let container = UIView(frame: CGRect(x: 16, y: y, width: width - 32, height: itemHeight))
             container.backgroundColor = theme.list.itemBlocksBackgroundColor
             container.layer.cornerRadius = 10
@@ -82,9 +89,8 @@ private final class GhostModeController: ViewController {
             toggle.isOn = item.get()
             toggle.onTintColor = theme.list.itemAccentColor
             toggle.frame = CGRect(x: container.bounds.width - 67, y: (itemHeight - 31) / 2, width: 51, height: 31)
-            toggle.addAction(UIAction { _ in
-                item.set(toggle.isOn)
-            }, for: .valueChanged)
+            toggle.tag = index
+            toggle.addTarget(self, action: #selector(switchChanged(_:)), for: .valueChanged)
             container.addSubview(toggle)
 
             scrollView.addSubview(container)
@@ -93,6 +99,11 @@ private final class GhostModeController: ViewController {
 
         scrollView.contentSize = CGSize(width: width, height: y + 20)
         self.displayNode.view.addSubview(scrollView)
+    }
+
+    @objc private func switchChanged(_ sender: UISwitch) {
+        guard sender.tag < self.switchChangedActions.count else { return }
+        self.switchChangedActions[sender.tag](sender.isOn)
     }
 
     override func containerLayoutUpdated(_ layout: ContainerViewLayout, transition: ContainedViewLayoutTransition) {
