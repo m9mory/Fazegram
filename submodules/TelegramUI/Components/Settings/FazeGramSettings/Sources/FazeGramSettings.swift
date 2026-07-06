@@ -1,8 +1,8 @@
 import Foundation
 import Postbox
 import SwiftSignalKit
-
-// MARK: - Модель настроек
+import TelegramCore
+import TelegramUIPreferences
 
 public struct FazeGramSettingsData: Codable, Equatable {
     public var hideReadReceipts: Bool
@@ -24,15 +24,6 @@ public struct FazeGramSettingsData: Codable, Equatable {
     }
 }
 
-extension FazeGramSettingsData: PreferencesEntry {
-    public func isEqual(to: PreferencesEntry) -> Bool {
-        guard let other = to as? FazeGramSettingsData else { return false }
-        return self == other
-    }
-}
-
-// MARK: - Ключ в AccountManager
-
 public func fazeGramSettings(accountManager: AccountManager<TelegramAccountManagerTypes>) -> Signal<FazeGramSettingsData, NoError> {
     return accountManager.sharedData(keys: [ApplicationSpecificSharedDataKeys.fazeGramSettings])
     |> map { sharedData -> FazeGramSettingsData in
@@ -41,8 +32,10 @@ public func fazeGramSettings(accountManager: AccountManager<TelegramAccountManag
 }
 
 public func updateFazeGramSettings(accountManager: AccountManager<TelegramAccountManagerTypes>, _ f: @escaping (FazeGramSettingsData) -> FazeGramSettingsData) -> Signal<Void, NoError> {
-    return accountManager.updateSharedData(key: ApplicationSpecificSharedDataKeys.fazeGramSettings, { current in
-        let settings = current?.get(FazeGramSettingsData.self) ?? .defaultValue
-        return PreferencesEntry(f(settings))
-    })
+    return accountManager.transaction { transaction in
+        let settings = transaction.getSharedData(ApplicationSpecificSharedDataKeys.fazeGramSettings)?.get(FazeGramSettingsData.self) ?? .defaultValue
+        transaction.updateSharedData(ApplicationSpecificSharedDataKeys.fazeGramSettings) { _ in
+            return PreferencesEntry(f(settings))
+        }
+    }
 }
