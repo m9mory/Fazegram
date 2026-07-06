@@ -511,10 +511,9 @@ func initializedNetwork(accountId: AccountRecordId, arguments: NetworkInitializa
                 let useNetworkFramework: Bool
                 if let customValue = networkSettings.useNetworkFramework {
                     useNetworkFramework = customValue
-                } else if arguments.useBetaFeatures {
-                    useNetworkFramework = true
                 } else {
-                    useNetworkFramework = false
+                    // Default to Network.framework for sideload compatibility (SideStore, LiveContainer)
+                    useNetworkFramework = true
                 }
                 
                 if useNetworkFramework {
