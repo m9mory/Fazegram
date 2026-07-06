@@ -7,6 +7,7 @@ import TelegramCore
 import SettingsUI
 import PeerInfoStoryGridScreen
 import CallListUI
+import FazeGramSettings
 import PassportUI
 import AccountUtils
 import OverlayStatusController
