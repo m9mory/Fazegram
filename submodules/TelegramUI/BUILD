@@ -439,6 +439,7 @@ swift_library(
         "//submodules/TelegramUI/Components/Settings/BusinessIntroSetupScreen",
         "//submodules/TelegramUI/Components/Settings/QuickReplyNameAlertController",
         "//submodules/TelegramUI/Components/Settings/CollectibleItemInfoScreen",
+        "//submodules/TelegramUI/Components/Settings/FazeGramSettings",
         "//submodules/TelegramUI/Components/StickerPickerScreen",
         "//submodules/TelegramUI/Components/Chat/ChatEmptyNode",
         "//submodules/TelegramUI/Components/Chat/ChatMediaInputStickerGridItem",

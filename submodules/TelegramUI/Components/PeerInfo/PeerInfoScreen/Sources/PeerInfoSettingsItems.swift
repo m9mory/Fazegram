@@ -10,6 +10,7 @@ import SwiftSignalKit
 import PhotoResources
 import ItemListPeerItem
 import DeviceAccess
+import FazeGramSettings
 import TelegramStringFormatting
 import PeerNameColorItem
 
@@ -18,6 +19,7 @@ enum SettingsSection: Int, CaseIterable {
     case phone
     case accounts
     case myProfile
+    case fazeGram
     case proxy
     case apps
     case shortcuts
@@ -150,7 +152,12 @@ func settingsItems(data: PeerInfoScreenData?, context: AccountContext, presentat
         items[.myProfile]!.append(PeerInfoScreenDisclosureItem(id: 0, text: presentationData.strings.Settings_MyProfile, icon: PresentationResourcesSettings.myProfile, action: {
             interaction.openSettings(.profile)
         }))
-        
+
+        items[.fazeGram] = []
+        items[.fazeGram]!.append(PeerInfoScreenDisclosureItem(id: 0, text: "Fazegram", icon: PresentationResourcesSettings.myProfile, action: {
+            interaction.pushViewControllerImpl?(fazeGramSettingsController(context: context))
+        }))
+
         if !settings.proxySettings.servers.isEmpty {
             let proxyType: String
             if settings.proxySettings.enabled, let activeServer = settings.proxySettings.activeServer {
