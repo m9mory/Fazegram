@@ -1,9 +1,12 @@
 import Foundation
 import UIKit
 import Display
-import SwiftUI
+import ItemListUI
+import SwiftSignalKit
 import AccountContext
+import TelegramCore
 import TelegramPresentationData
+import TelegramUIPreferences
 
 // MARK: - Главный экран вкладки Fazegram
 
