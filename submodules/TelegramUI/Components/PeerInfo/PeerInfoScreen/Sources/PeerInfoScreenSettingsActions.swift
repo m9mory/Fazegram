@@ -294,6 +294,8 @@ extension PeerInfoScreenNode {
             if let tonContext = self.controller?.tonContext {
                 push(self.context.sharedContext.makeStarsTransactionsScreen(context: self.context, starsContext: tonContext))
             }
+        case .fazeGram:
+            push(fazeGramSettingsController(context: self.context))
         }
     }
 
