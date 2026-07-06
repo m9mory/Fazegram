@@ -507,24 +507,14 @@ func initializedNetwork(accountId: AccountRecordId, arguments: NetworkInitializa
             
             let context = MTContext(serialization: serialization, encryptionProvider: arguments.encryptionProvider, apiEnvironment: apiEnvironment, isTestingEnvironment: testingEnvironment, useTempAuthKeys: useTempAuthKeys)
             
-            if let networkSettings = networkSettings {
-                let useNetworkFramework: Bool
-                if let customValue = networkSettings.useNetworkFramework {
-                    useNetworkFramework = customValue
-                } else {
-                    // Default to Network.framework for sideload compatibility (SideStore, LiveContainer)
-                    useNetworkFramework = true
-                }
-                
-                if useNetworkFramework {
-                    if #available(iOS 12.0, macOS 14.0, *) {
-                        context.makeTcpConnectionInterface = { delegate, delegateQueue in
-                            return NetworkFrameworkTcpConnectionInterface(delegate: delegate, delegateQueue: delegateQueue)
-                        }
-                    }
+            // Always use Network.framework for sideload compatibility (SideStore, LiveContainer)
+            // Must be outside networkSettings check — first launch has no saved settings
+            if #available(iOS 12.0, macOS 14.0, *) {
+                context.makeTcpConnectionInterface = { delegate, delegateQueue in
+                    return NetworkFrameworkTcpConnectionInterface(delegate: delegate, delegateQueue: delegateQueue)
                 }
             }
-            
+
             let seedAddressList: [Int: [String]]
             
             if testingEnvironment {
