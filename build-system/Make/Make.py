@@ -101,8 +101,9 @@ class BazelCommandLine:
             #'--@build_bazel_rules_swift//swift:copt="-num-threads 0"',
 
             # Strip unsused code.
-            '--features=dead_strip',
-            '--objc_enable_binary_stripping',
+            # DISABLED for sideload compatibility (caused launch crash)
+            #'--features=dead_strip',
+            #'--objc_enable_binary_stripping',
         ]
 
     def set_lock(self, lock):
