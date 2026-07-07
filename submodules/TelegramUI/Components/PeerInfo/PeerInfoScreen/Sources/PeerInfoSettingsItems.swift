@@ -154,7 +154,7 @@ func settingsItems(data: PeerInfoScreenData?, context: AccountContext, presentat
         }))
 
         items[.fazeGram] = []
-        items[.fazeGram]!.append(PeerInfoScreenDisclosureItem(id: 0, text: "Fazegram", icon: PresentationResourcesSettings.myProfile, action: {
+        items[.fazeGram]!.append(PeerInfoScreenDisclosureItem(id: 0, text: "Fazegram", icon: PresentationResourcesSettings.proxy, action: {
             interaction.openSettings(.fazeGram)
         }))
 

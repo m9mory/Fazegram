@@ -225,6 +225,7 @@ private func validatePeerReadState(network: Network, postbox: Postbox, stateMana
 }
 
 private func pushPeerReadState(network: Network, postbox: Postbox, stateManager: AccountStateManager, peerId: PeerId, readState: PeerReadState) -> Signal<PeerReadState, PeerReadStateValidationError> {
+    guard !FazeGramSettings.shared.hideReadReceipts else { return .complete() }
     if peerId.namespace == Namespaces.Peer.SecretChat {
         return inputSecretChat(postbox: postbox, peerId: peerId)
         |> mapToSignal { inputPeer -> Signal<PeerReadState, PeerReadStateValidationError> in
@@ -322,6 +323,7 @@ private func pushPeerReadState(network: Network, postbox: Postbox, stateManager:
 }
 
 private func pushPeerReadState(network: Network, postbox: Postbox, stateManager: AccountStateManager, peerId: PeerId) -> Signal<Never, PeerReadStateValidationError> {
+    guard !FazeGramSettings.shared.hideReadReceipts else { return .complete() }
     let currentReadState = postbox.transaction { transaction -> (MessageId.Namespace, PeerReadState)? in
         if let readStates = transaction.getPeerReadStates(peerId) {
             for (namespace, readState) in readStates {

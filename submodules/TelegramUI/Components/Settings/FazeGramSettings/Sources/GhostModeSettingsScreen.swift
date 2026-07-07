@@ -10,6 +10,8 @@ import SwiftSignalKit
 private final class GhostModeController: ViewController {
     private let ctx: AccountContext
     private var presentationDataValue: PresentationData
+    private var switchChangedActions: [(Bool) -> Void] = []
+    private var uiSetupDone = false
 
     init(context: AccountContext, presentationData: PresentationData) {
         self.ctx = context
@@ -26,14 +28,21 @@ private final class GhostModeController: ViewController {
         self.displayNode = ASDisplayNode()
         self.displayNode.backgroundColor = presentationDataValue.theme.list.plainBackgroundColor
         self.displayNodeDidLoad()
-        setupUI()
     }
 
-    private var switchChangedActions: [(Bool) -> Void] = []
+    override func containerLayoutUpdated(_ layout: ContainerViewLayout, transition: ContainedViewLayoutTransition) {
+        super.containerLayoutUpdated(layout, transition: transition)
+        self.displayNode.frame = CGRect(origin: .zero, size: layout.size)
 
-    private func setupUI() {
+        if !uiSetupDone {
+            uiSetupDone = true
+            setupUI(with: layout.size)
+        }
+    }
+
+    private func setupUI(with size: CGSize) {
         let theme = presentationDataValue.theme
-        let scrollView = UIScrollView(frame: self.displayNode.bounds)
+        let scrollView = UIScrollView(frame: CGRect(origin: .zero, size: size))
         scrollView.alwaysBounceVertical = true
         scrollView.backgroundColor = theme.list.plainBackgroundColor
 
@@ -69,26 +78,39 @@ private final class GhostModeController: ViewController {
 
         self.switchChangedActions = items.map { $0.set }
 
+        let width = size.width
         var y: CGFloat = 20.0
         let itemHeight: CGFloat = 44.0
-        let width = self.displayNode.bounds.width
 
         for (index, item) in items.enumerated() {
+            let isFirst = index == 0
+            let isLast = index == items.count - 1
+
             let container = UIView(frame: CGRect(x: 16, y: y, width: width - 32, height: itemHeight))
             container.backgroundColor = theme.list.itemBlocksBackgroundColor
-            container.layer.cornerRadius = 10
+
+            if isFirst {
+                container.layer.cornerRadius = 10
+                container.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+            } else if isLast {
+                container.layer.cornerRadius = 10
+                container.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
+            }
             container.clipsToBounds = true
 
-            let label = UILabel(frame: CGRect(x: 16, y: 0, width: container.bounds.width - 80, height: itemHeight))
+            let label = UILabel()
             label.text = item.title
             label.font = Font.regular(17.0)
             label.textColor = theme.list.itemPrimaryTextColor
+            label.sizeToFit()
+            label.frame = CGRect(x: 16, y: (itemHeight - label.frame.height) / 2, width: label.frame.width, height: label.frame.height)
             container.addSubview(label)
 
             let toggle = UISwitch()
             toggle.isOn = item.get()
             toggle.onTintColor = theme.list.itemAccentColor
-            toggle.frame = CGRect(x: container.bounds.width - 67, y: (itemHeight - 31) / 2, width: 51, height: 31)
+            toggle.sizeToFit()
+            toggle.frame = CGRect(x: container.frame.width - toggle.frame.width - 16, y: (itemHeight - toggle.frame.height) / 2, width: toggle.frame.width, height: toggle.frame.height)
             toggle.tag = index
             toggle.addTarget(self, action: #selector(switchChanged(_:)), for: .valueChanged)
             container.addSubview(toggle)
@@ -104,14 +126,6 @@ private final class GhostModeController: ViewController {
     @objc private func switchChanged(_ sender: UISwitch) {
         guard sender.tag < self.switchChangedActions.count else { return }
         self.switchChangedActions[sender.tag](sender.isOn)
-    }
-
-    override func containerLayoutUpdated(_ layout: ContainerViewLayout, transition: ContainedViewLayoutTransition) {
-        super.containerLayoutUpdated(layout, transition: transition)
-        self.displayNode.frame = CGRect(origin: .zero, size: layout.size)
-        if let scrollView = self.displayNode.view.subviews.first as? UIScrollView {
-            scrollView.frame = CGRect(origin: .zero, size: layout.size)
-        }
     }
 }
 
