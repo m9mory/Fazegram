@@ -87,14 +87,12 @@ private enum FazeGramScreenEntry: ItemListNodeEntry {
         switch self {
         case .privacyHeader, .ghostMode:
             return 0
-        case .otherHeader, .avatarLimit:
+        case .otherHeader, .avatarLimit, .avatarLimitDesc:
             return 1
-        case .avatarLimitDesc:
-            return 2
         case .linksSeparator, .ourChannel, .ourChat:
-            return 3
+            return 2
         case .versionFooter:
-            return 4
+            return 3
         }
     }
 
