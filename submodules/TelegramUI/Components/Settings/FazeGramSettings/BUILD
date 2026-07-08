@@ -18,6 +18,7 @@ swift_library(
         "//submodules/Postbox",
         "//submodules/SSignalKit/SwiftSignalKit",
         "//submodules/TelegramCore",
+        "//submodules/PresentationDataUtils",
         "//submodules/TelegramUIPreferences",
     ],
     visibility = [

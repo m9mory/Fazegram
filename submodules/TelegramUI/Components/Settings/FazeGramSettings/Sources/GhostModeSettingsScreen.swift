@@ -7,6 +7,7 @@ import AccountContext
 import TelegramCore
 import TelegramPresentationData
 import TelegramUIPreferences
+import PresentationDataUtils
 
 public func ghostModeSettingsController(context: AccountContext) -> ViewController {
     let presentationData = context.sharedContext.currentPresentationData.with { $0 }

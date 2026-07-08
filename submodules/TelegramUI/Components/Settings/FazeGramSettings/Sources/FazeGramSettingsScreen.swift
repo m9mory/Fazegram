@@ -7,6 +7,7 @@ import AccountContext
 import TelegramCore
 import TelegramPresentationData
 import TelegramUIPreferences
+import PresentationDataUtils
 
 public func fazeGramSettingsController(context: AccountContext) -> ViewController {
     let presentationData = context.sharedContext.currentPresentationData.with { $0 }
@@ -168,6 +169,7 @@ private enum FazeGramScreenEntry: ItemListNodeEntry {
             return ItemListDisclosureItem(
                 presentationData: presentationData,
                 title: "Наш канал",
+                label: "",
                 sectionId: self.section,
                 style: .blocks,
                 action: { arguments.openChannel() }
@@ -176,6 +178,7 @@ private enum FazeGramScreenEntry: ItemListNodeEntry {
             return ItemListDisclosureItem(
                 presentationData: presentationData,
                 title: "Наш чат",
+                label: "",
                 sectionId: self.section,
                 style: .blocks,
                 action: { arguments.openChat() }
