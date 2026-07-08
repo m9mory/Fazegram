@@ -1,135 +1,128 @@
 import Foundation
 import UIKit
 import Display
-import AsyncDisplayKit
+import ItemListUI
+import SwiftSignalKit
 import AccountContext
 import TelegramCore
 import TelegramPresentationData
-import SwiftSignalKit
-
-private final class GhostModeController: ViewController {
-    private let ctx: AccountContext
-    private var presentationDataValue: PresentationData
-    private var switchChangedActions: [(Bool) -> Void] = []
-    private var uiSetupDone = false
-
-    init(context: AccountContext, presentationData: PresentationData) {
-        self.ctx = context
-        self.presentationDataValue = presentationData
-        super.init(navigationBarPresentationData: nil)
-        self.title = "Fazegram"
-    }
-
-    required init(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    override func loadDisplayNode() {
-        self.displayNode = ASDisplayNode()
-        self.displayNode.backgroundColor = presentationDataValue.theme.list.plainBackgroundColor
-        self.displayNodeDidLoad()
-    }
-
-    override func containerLayoutUpdated(_ layout: ContainerViewLayout, transition: ContainedViewLayoutTransition) {
-        super.containerLayoutUpdated(layout, transition: transition)
-        self.displayNode.frame = CGRect(origin: .zero, size: layout.size)
-
-        if !uiSetupDone {
-            uiSetupDone = true
-            setupUI(with: layout.size)
-        }
-    }
-
-    private func setupUI(with size: CGSize) {
-        let theme = presentationDataValue.theme
-        let scrollView = UIScrollView(frame: CGRect(origin: .zero, size: size))
-        scrollView.alwaysBounceVertical = true
-        scrollView.backgroundColor = theme.list.plainBackgroundColor
-
-        let items: [(title: String, get: () -> Bool, set: (Bool) -> Void)] = [
-            (
-                title: "Скрыть прочтение",
-                get: { FazeGramSettings.shared.hideReadReceipts },
-                set: { [weak self] v in
-                    guard let self = self else { return }
-                    FazeGramSettings.shared.hideReadReceipts = v
-                    let _ = updateFazeGramSettings(accountManager: self.ctx.sharedContext.accountManager) { s in var s = s; s.hideReadReceipts = v; return s }.start()
-                }
-            ),
-            (
-                title: "Скрыть просмотр сторис",
-                get: { FazeGramSettings.shared.hideStoryViews },
-                set: { [weak self] v in
-                    guard let self = self else { return }
-                    FazeGramSettings.shared.hideStoryViews = v
-                    let _ = updateFazeGramSettings(accountManager: self.ctx.sharedContext.accountManager) { s in var s = s; s.hideStoryViews = v; return s }.start()
-                }
-            ),
-            (
-                title: "Скрыть онлайн",
-                get: { FazeGramSettings.shared.hideOnline },
-                set: { [weak self] v in
-                    guard let self = self else { return }
-                    FazeGramSettings.shared.hideOnline = v
-                    let _ = updateFazeGramSettings(accountManager: self.ctx.sharedContext.accountManager) { s in var s = s; s.hideOnline = v; return s }.start()
-                }
-            ),
-        ]
-
-        self.switchChangedActions = items.map { $0.set }
-
-        let width = size.width
-        var y: CGFloat = 20.0
-        let itemHeight: CGFloat = 44.0
-
-        for (index, item) in items.enumerated() {
-            let isFirst = index == 0
-            let isLast = index == items.count - 1
-
-            let container = UIView(frame: CGRect(x: 16, y: y, width: width - 32, height: itemHeight))
-            container.backgroundColor = theme.list.itemBlocksBackgroundColor
-
-            if isFirst {
-                container.layer.cornerRadius = 10
-                container.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
-            } else if isLast {
-                container.layer.cornerRadius = 10
-                container.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
-            }
-            container.clipsToBounds = true
-
-            let label = UILabel()
-            label.text = item.title
-            label.font = Font.regular(17.0)
-            label.textColor = theme.list.itemPrimaryTextColor
-            label.sizeToFit()
-            label.frame = CGRect(x: 16, y: (itemHeight - label.frame.height) / 2, width: label.frame.width, height: label.frame.height)
-            container.addSubview(label)
-
-            let toggle = UISwitch()
-            toggle.isOn = item.get()
-            toggle.onTintColor = theme.list.itemAccentColor
-            toggle.sizeToFit()
-            toggle.frame = CGRect(x: container.frame.width - toggle.frame.width - 16, y: (itemHeight - toggle.frame.height) / 2, width: toggle.frame.width, height: toggle.frame.height)
-            toggle.tag = index
-            toggle.addTarget(self, action: #selector(switchChanged(_:)), for: .valueChanged)
-            container.addSubview(toggle)
-
-            scrollView.addSubview(container)
-            y += itemHeight + 1
-        }
-
-        scrollView.contentSize = CGSize(width: width, height: y + 20)
-        self.displayNode.view.addSubview(scrollView)
-    }
-
-    @objc private func switchChanged(_ sender: UISwitch) {
-        guard sender.tag < self.switchChangedActions.count else { return }
-        self.switchChangedActions[sender.tag](sender.isOn)
-    }
-}
+import TelegramUIPreferences
 
 public func ghostModeSettingsController(context: AccountContext) -> ViewController {
     let presentationData = context.sharedContext.currentPresentationData.with { $0 }
-    return GhostModeController(context: context, presentationData: presentationData)
+
+    let signal = fazeGramSettings(accountManager: context.sharedContext.accountManager)
+    |> map { settings -> (ItemListControllerState, (ItemListNodeState, Any)) in
+        let arguments = GhostModeArguments(
+            toggleHideReadReceipts: { value in
+                FazeGramSettings.shared.hideReadReceipts = value
+                let _ = updateFazeGramSettings(accountManager: context.sharedContext.accountManager) { s in var s = s; s.hideReadReceipts = value; return s }.start()
+            },
+            toggleHideStoryViews: { value in
+                FazeGramSettings.shared.hideStoryViews = value
+                let _ = updateFazeGramSettings(accountManager: context.sharedContext.accountManager) { s in var s = s; s.hideStoryViews = value; return s }.start()
+            },
+            toggleHideOnline: { value in
+                FazeGramSettings.shared.hideOnline = value
+                let _ = updateFazeGramSettings(accountManager: context.sharedContext.accountManager) { s in var s = s; s.hideOnline = value; return s }.start()
+            }
+        )
+
+        let entries: [GhostModeEntry] = [
+            .hideReadReceipts(settings.hideReadReceipts),
+            .hideStoryViews(settings.hideStoryViews),
+            .hideOnline(settings.hideOnline),
+            .hideTyping,
+        ]
+
+        let controllerState = ItemListControllerState(
+            presentationData: ItemListPresentationData(presentationData),
+            title: .text("Режим призрака"),
+            leftNavigationButton: nil,
+            rightNavigationButton: nil,
+            backNavigationButton: ItemListBackButton(title: "Fazegram")
+        )
+
+        let listState = ItemListNodeState(
+            presentationData: ItemListPresentationData(presentationData),
+            entries: entries,
+            style: .blocks
+        )
+
+        return (controllerState, (listState, arguments))
+    }
+
+    return ItemListController(context: context, state: signal)
+}
+
+private struct GhostModeArguments {
+    let toggleHideReadReceipts: (Bool) -> Void
+    let toggleHideStoryViews: (Bool) -> Void
+    let toggleHideOnline: (Bool) -> Void
+}
+
+private enum GhostModeEntry: ItemListNodeEntry {
+    case hideReadReceipts(Bool)
+    case hideStoryViews(Bool)
+    case hideOnline(Bool)
+    case hideTyping
+
+    var section: ItemListSectionId { return 0 }
+
+    var stableId: Int {
+        switch self {
+        case .hideReadReceipts: return 0
+        case .hideStoryViews: return 1
+        case .hideOnline: return 2
+        case .hideTyping: return 3
+        }
+    }
+
+    var sortIndex: Int { return self.stableId }
+
+    static func < (lhs: GhostModeEntry, rhs: GhostModeEntry) -> Bool {
+        return lhs.sortIndex < rhs.sortIndex
+    }
+
+    func item(presentationData: ItemListPresentationData, arguments: Any) -> ListViewItem {
+        let arguments = arguments as! GhostModeArguments
+        switch self {
+        case let .hideReadReceipts(value):
+            return ItemListSwitchItem(
+                presentationData: presentationData,
+                title: "Скрыть прочтение",
+                value: value,
+                sectionId: self.section,
+                style: .blocks,
+                updated: { arguments.toggleHideReadReceipts($0) }
+            )
+        case let .hideStoryViews(value):
+            return ItemListSwitchItem(
+                presentationData: presentationData,
+                title: "Скрыть просмотр сторис",
+                value: value,
+                sectionId: self.section,
+                style: .blocks,
+                updated: { arguments.toggleHideStoryViews($0) }
+            )
+        case let .hideOnline(value):
+            return ItemListSwitchItem(
+                presentationData: presentationData,
+                title: "Скрыть онлайн",
+                value: value,
+                sectionId: self.section,
+                style: .blocks,
+                updated: { arguments.toggleHideOnline($0) }
+            )
+        case .hideTyping:
+            return ItemListDisclosureItem(
+                presentationData: presentationData,
+                title: "Скрыть печатание",
+                label: "Скоро",
+                sectionId: self.section,
+                style: .blocks,
+                action: {}
+            )
+        }
+    }
 }

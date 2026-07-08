@@ -19,4 +19,9 @@ public final class FazeGramSettings {
         get { defaults.bool(forKey: "fazegram_hideOnline") }
         set { defaults.set(newValue, forKey: "fazegram_hideOnline") }
     }
+
+    public var avatarLimitUnlocked: Bool {
+        get { defaults.bool(forKey: "fazegram_avatarLimitUnlocked") }
+        set { defaults.set(newValue, forKey: "fazegram_avatarLimitUnlocked") }
+    }
 }
