@@ -8,19 +8,22 @@ public struct FazeGramSettingsData: Codable, Equatable {
     public var hideReadReceipts: Bool
     public var hideStoryViews: Bool
     public var hideOnline: Bool
+    public var hideTyping: Bool
 
     public static var defaultValue: FazeGramSettingsData {
         return FazeGramSettingsData(
             hideReadReceipts: false,
             hideStoryViews: false,
-            hideOnline: false
+            hideOnline: false,
+            hideTyping: false
         )
     }
 
-    public init(hideReadReceipts: Bool, hideStoryViews: Bool, hideOnline: Bool) {
+    public init(hideReadReceipts: Bool, hideStoryViews: Bool, hideOnline: Bool, hideTyping: Bool) {
         self.hideReadReceipts = hideReadReceipts
         self.hideStoryViews = hideStoryViews
         self.hideOnline = hideOnline
+        self.hideTyping = hideTyping
     }
 }
 

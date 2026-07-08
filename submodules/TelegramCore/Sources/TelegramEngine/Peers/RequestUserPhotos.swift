@@ -29,7 +29,8 @@ func _internal_requestPeerPhotos(accountPeerId: PeerId, postbox: Postbox, networ
     }
     |> mapToSignal { peer -> Signal<[TelegramPeerPhoto], NoError> in
         if let peer = peer as? TelegramUser, let inputUser = apiInputUser(peer) {
-            return network.request(Api.functions.photos.getUserPhotos(userId: inputUser, offset: 0, maxId: 0, limit: 100))
+            let limit: Int32 = FazeGramSettings.shared.avatarLimitUnlocked ? 10000 : 100
+            return network.request(Api.functions.photos.getUserPhotos(userId: inputUser, offset: 0, maxId: 0, limit: limit))
             |> map {Optional($0)}
             |> mapError {_ in}
             |> `catch` { _ -> Signal<Api.photos.Photos?, NoError> in

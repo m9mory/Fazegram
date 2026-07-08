@@ -25,6 +25,10 @@ public func ghostModeSettingsController(context: AccountContext) -> ViewControll
             toggleHideOnline: { value in
                 FazeGramSettings.shared.hideOnline = value
                 let _ = updateFazeGramSettings(accountManager: context.sharedContext.accountManager) { s in var s = s; s.hideOnline = value; return s }.start()
+            },
+            toggleHideTyping: { value in
+                FazeGramSettings.shared.hideTyping = value
+                let _ = updateFazeGramSettings(accountManager: context.sharedContext.accountManager) { s in var s = s; s.hideTyping = value; return s }.start()
             }
         )
 
@@ -32,7 +36,7 @@ public func ghostModeSettingsController(context: AccountContext) -> ViewControll
             .hideReadReceipts(settings.hideReadReceipts),
             .hideStoryViews(settings.hideStoryViews),
             .hideOnline(settings.hideOnline),
-            .hideTyping,
+            .hideTyping(settings.hideTyping),
         ]
 
         let controllerState = ItemListControllerState(
@@ -59,13 +63,14 @@ private struct GhostModeArguments {
     let toggleHideReadReceipts: (Bool) -> Void
     let toggleHideStoryViews: (Bool) -> Void
     let toggleHideOnline: (Bool) -> Void
+    let toggleHideTyping: (Bool) -> Void
 }
 
 private enum GhostModeEntry: ItemListNodeEntry {
     case hideReadReceipts(Bool)
     case hideStoryViews(Bool)
     case hideOnline(Bool)
-    case hideTyping
+    case hideTyping(Bool)
 
     var section: ItemListSectionId { return 0 }
 
@@ -114,14 +119,14 @@ private enum GhostModeEntry: ItemListNodeEntry {
                 style: .blocks,
                 updated: { arguments.toggleHideOnline($0) }
             )
-        case .hideTyping:
-            return ItemListDisclosureItem(
+        case let .hideTyping(value):
+            return ItemListSwitchItem(
                 presentationData: presentationData,
                 title: "Скрыть печатание",
-                label: "Скоро",
+                value: value,
                 sectionId: self.section,
                 style: .blocks,
-                action: {}
+                updated: { arguments.toggleHideTyping($0) }
             )
         }
     }

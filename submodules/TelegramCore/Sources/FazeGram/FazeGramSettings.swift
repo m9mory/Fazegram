@@ -20,6 +20,11 @@ public final class FazeGramSettings {
         set { defaults.set(newValue, forKey: "fazegram_hideOnline") }
     }
 
+    public var hideTyping: Bool {
+        get { defaults.bool(forKey: "fazegram_hideTyping") }
+        set { defaults.set(newValue, forKey: "fazegram_hideTyping") }
+    }
+
     public var avatarLimitUnlocked: Bool {
         get { defaults.bool(forKey: "fazegram_avatarLimitUnlocked") }
         set { defaults.set(newValue, forKey: "fazegram_avatarLimitUnlocked") }
