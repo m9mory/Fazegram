@@ -102,26 +102,9 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if [ $((BUILD_NUMBER % 3)) -eq 0 ]; then
-            STABLE_TAG="🟢 STABLE"
-            STABLE_NOTES="## Fazegram $APP_VERSION ($BUILD_NUMBER) — Stable Release
-
-          Это стабильная версия. Можно использовать ничего не боясь.
-
-          **Что работает:**
-          - 👻 Режим призрака (скрытие прочтения, онлайна, сторис, печатания)
-          - 📱 Вход через LiveContainer
-          - 🎨 Брендинг Fazegram
-
-          🤖 Generated with [Claude Code](https://claude.com/claude-code)"
-            gh release create "build-$BUILD_NUMBER" \
-              --title "🟢 Fazegram $APP_VERSION ($BUILD_NUMBER) STABLE" \
-              --notes "$STABLE_NOTES"
-          else
-            gh release create "build-$BUILD_NUMBER" \
-              --title "Fazegram $APP_VERSION ($BUILD_NUMBER)" \
-              --notes "An unsigned build of Fazegram for iOS $APP_VERSION ($BUILD_NUMBER). Может содержать баги, тестируется."
-          fi
+          gh release create "build-$BUILD_NUMBER" \
+            --title "Fazegram $APP_VERSION ($BUILD_NUMBER)" \
+            --notes "An unsigned build of Fazegram for iOS $APP_VERSION ($BUILD_NUMBER)"
 
       - name: Upload Release IPA
         env:
