@@ -181,7 +181,7 @@ private func requestActivity(postbox: Postbox, network: Network, accountPeerId: 
                 if topMessageId != nil {
                     flags |= 1 << 0
                 }
-                guard !FazeGramSettings.shared.hideTyping else { return .complete() }
+                guard !FazeGramSettings.shared.hideTyping else { return .single(Void()) }
                 return network.request(Api.functions.messages.setTyping(flags: flags, peer: inputPeer, topMsgId: topMessageId, action: actionFromActivity(activity)))
                 |> `catch` { _ -> Signal<Api.Bool, NoError> in
                     return .single(.boolFalse)
