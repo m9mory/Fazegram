@@ -3,7 +3,7 @@ import Foundation
 public final class FazeGramSettings {
     public static let shared = FazeGramSettings()
 
-    private let defaults = UserDefaults(suiteName: "group.ph.telegra.Telegraph") ?? UserDefaults.standard
+    private let defaults = UserDefaults.standard
 
     public var hideReadReceipts: Bool {
         get { defaults.bool(forKey: "fazegram_hideReadReceipts") }
